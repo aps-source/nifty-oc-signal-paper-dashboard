@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>NIFTY OC Signal -- Paper Trade</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:0 auto;padding:16px;
+background:#0B1220;color:#E5E7EB}
+.topbar{background:#111827;padding:8px 14px;margin:-16px -16px 16px;font-size:14px}
+.topbar a{color:#93C5FD;text-decoration:none}
+h1{font-size:22px} .muted{color:#9CA3AF;font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}
+.tile{background:#111827;border-radius:10px;padding:10px 12px}
+.tile .k{font-size:12px;color:#9CA3AF} .tile .v{font-size:18px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:6px 8px;border-bottom:1px solid #1F2937;text-align:left}
+img{width:100%;border-radius:8px;margin:10px 0}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:600;font-size:13px}
+.preview{background:#78350F;color:#FEF3C7;padding:8px 12px;border-radius:8px;margin:10px 0;font-size:13px}
+</style></head><body>
+<!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
+
+<h1>NIFTY Option-Chain Signal -- Paper Trade</h1>
+<p class="muted">Confirmation model (5m/15m/60m price+OI+IV weighted score). PAPER ONLY, no real orders.
+Backtest on 10 prior sessions showed ~coin-flip win rate (48-57%) -- treat every number below as a live
+continuation of that test, not a validated edge. Live paper trading starts 2026-10-12. Last updated 2026-10-10 21:03:48.</p>
+<div class="preview">Preview -- showing the last available session (2026-10-09). No position is open; trading starts 2026-10-12.</div>
+
+<div class="tiles">
+  <div class="tile"><div class="k">Overall Status</div><div class="v" style="color:#6B7280">No Signal</div></div>
+  <div class="tile"><div class="k">Strongest Strike</div><div class="v">--</div></div>
+  <div class="tile"><div class="k">Confidence</div><div class="v">--</div></div>
+  <div class="tile"><div class="k">Data Quality</div><div class="v">Partial history</div></div>
+  <div class="tile"><div class="k">PCR (OI)</div><div class="v">1.12</div></div>
+  <div class="tile"><div class="k">Resistance</div><div class="v">23000 <span class="muted">14.5M OI</span></div></div>
+  <div class="tile"><div class="k">Support</div><div class="v">22500 <span class="muted">13.2M OI</span></div></div>
+  <div class="tile"><div class="k">Max Pain</div><div class="v">22500</div></div>
+  <div class="tile"><div class="k">ATM Straddle OI</div><div class="v">23.1M</div></div>
+</div>
+
+<h2>Position</h2>
+<p>Flat -- no open position.</p>
+
+<h2>Today's chart</h2>
+<img src="charts/chart_latest.png" alt="today's NIFTY spot vs signal chart">
+
+<h2>Recent trades <span class="muted">(0 total, 0% win, +0.0 net pts)</span> -- <a href="trades.html" style="color:#93C5FD">full log</a></h2>
+<table><tr><th>Date</th><th>Side</th><th>Strike</th><th>Entry</th><th>Px</th><th>Exit</th><th>Px</th><th>Reason</th><th>P&amp;L pts</th></tr>
+<tr><td colspan='9'>No trades yet.</td></tr>
+</table>
+</body></html>
