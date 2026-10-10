@@ -132,9 +132,7 @@
   .decision.PENDING { background: linear-gradient(120deg, var(--slate-1), var(--slate-2)); }
   .decision.PENDING .glyph { background: rgba(255,255,255,0.12); }
 
-  .layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
-  .side { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); align-content: start; }
-  @media (min-width: 1040px) { .layout { grid-template-columns: 22rem minmax(0, 1fr); } .side { position: sticky; top: 1rem; grid-template-columns: minmax(0, 1fr); } }
+  #levels-card { margin-bottom: 1rem; }
   #root { min-width: 0; }
 
   .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 1rem; padding: 1.05rem 1.2rem; box-shadow: var(--shadow); }
@@ -184,7 +182,7 @@
   .ladder .spot { position: absolute; top: 0; transform: translateX(-50%); text-align: center; font-weight: 800; font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
   .ladder .spot::after { content: "▼"; display: block; font-size: 0.7rem; line-height: 0.8; margin-top: 1px; }
   .ladder .tick { position: absolute; top: 2.55rem; transform: translateX(-50%); font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); }
-  .lvl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-top: 0.6rem; }
+  .lvl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.55rem; margin-top: 0.6rem; }
   .lvl { border-radius: 0.75rem; padding: 0.5rem 0.7rem; background: var(--surface-2); border-left: 4px solid var(--c, var(--text-muted)); }
   .lvl .l { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; }
   .lvl .n { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
@@ -251,17 +249,14 @@
   <section class="kpis" id="kpis"></section>
   <section class="decisions" id="decision"></section>
 
-  <div class="layout">
-    <aside class="side">
-      <div class="card" id="levels-card">
-        <h2>Market levels &middot; NIFTY option-chain</h2>
-        <div id="oi-summary"></div>
-        <div class="disclaimer">PCR-based suggestion is a reference indicator only — backtest found no predictive
-        edge from PCR, OI walls or max-pain on their own. Shown for context, not as a signal.</div>
-      </div>
-    </aside>
-    <div id="root"></div>
+  <div class="card" id="levels-card">
+    <h2>Market levels &middot; NIFTY option-chain</h2>
+    <div id="oi-summary"></div>
+    <div class="disclaimer">PCR-based suggestion is a reference indicator only — backtest found no predictive
+    edge from PCR, OI walls or max-pain on their own. Shown for context, not as a signal.</div>
   </div>
+
+  <div id="root"></div>
 
   <footer>
     Reads live_state.json from this same site every 30s, pushed by the paper loop every 4 min, 09:19&ndash;15:47 IST
