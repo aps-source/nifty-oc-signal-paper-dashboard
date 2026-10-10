@@ -195,6 +195,11 @@
   .disclaimer { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 0.6rem; }
 
   img.daychart { width: 100%; border-radius: 0.8rem; display: block; margin-top: 0.3rem; }
+  .fs-btn { font: inherit; font-size: 0.78rem; font-weight: 700; padding: 0.3rem 0.7rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-secondary); cursor: pointer; }
+  .fs-btn:hover { color: var(--text-primary); }
+  .chart-frame { background: var(--surface-1); }
+  .chart-frame:fullscreen { display: flex; align-items: center; justify-content: center; background: #000; }
+  .chart-frame:fullscreen img.daychart { width: auto; height: auto; max-width: 100vw; max-height: 100vh; border-radius: 0; }
 
   table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
   th { text-align: left; color: var(--text-muted); font-weight: 700; padding: 0.4rem 0.4rem; border-bottom: 2px solid var(--gridline); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -463,8 +468,8 @@ function renderPanel(state) {
       </div>
       ${checklistHtml}
       <div class="box">
-        <h3>Today's chart</h3>
-        <img class="daychart" src="charts/chart_latest.png" alt="NIFTY spot vs signal, today">
+        <div class="chead"><h3 style="margin:0;">Today's chart</h3><button class="fs-btn" id="chart-fs-btn" title="Full screen">&#9974; Full screen</button></div>
+        <div class="chart-frame" id="chart-frame"><img class="daychart" id="chart-img" src="charts/chart_latest.png" alt="NIFTY spot vs signal, today"></div>
       </div>
       <div class="box">
         <h3>Trade log (today)</h3>
@@ -517,8 +522,26 @@ async function refresh() {
   renderDecision(state);
   renderLevels(state);
   $("root").innerHTML = renderPanel(state);
+  wireFullscreen();
 
   $("clock").textContent = "Updated " + new Date().toLocaleTimeString("en-IN") + " · refreshes every 30s";
+}
+
+let _fsListenerAdded = false;
+function wireFullscreen() {
+  const frame = $("chart-frame"), btn = $("chart-fs-btn");
+  if (!frame || !btn) return;
+  btn.onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else frame.requestFullscreen().catch(() => {});
+  };
+  if (!_fsListenerAdded) {
+    document.addEventListener("fullscreenchange", () => {
+      const b = $("chart-fs-btn");
+      if (b) b.innerHTML = document.fullscreenElement ? "&#10005; Exit full screen" : "&#9974; Full screen";
+    });
+    _fsListenerAdded = true;
+  }
 }
 
 refresh();
