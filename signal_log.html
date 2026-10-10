@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NIFTY Option-Chain Signal &mdash; Signal History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f2f5fa;
+    --surface-1:      #ffffff;
+    --surface-2:      #e9edf5;
+    --text-primary:   #11151f;
+    --text-secondary: #5a6478;
+    --text-muted:     #838da2;
+    --gridline:       #dbe1ec;
+    --border:         rgba(17,21,31,0.12);
+
+    --accent:         #4a3aa7;
+    --accent-soft:    rgba(74,58,167,0.10);
+
+    --good:           #0ca30c;
+    --critical:       #d03b3b;
+    --warning:        #b5710a;
+    --neutral-bg:     #e7eaf1;
+    --neutral-text:   #5a6478;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page:           #0a0d14;
+      --surface-1:      #141a26;
+      --surface-2:      #1c2434;
+      --text-primary:   #eef1f8;
+      --text-secondary: #9aa4bd;
+      --text-muted:     #7c869e;
+      --gridline:       #262f42;
+      --border:         rgba(238,241,248,0.12);
+
+      --accent:         #9085e9;
+      --accent-soft:    rgba(144,133,233,0.16);
+
+      --good:           #28c840;
+      --critical:       #f0645f;
+      --warning:        #f2b636;
+      --neutral-bg:     #232b3c;
+      --neutral-text:   #9aa4bd;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text-primary); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 20px 24px 40px; }
+
+  header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-bottom: 14px; }
+  h1 { font-size: 21px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); font-size: 15px; margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; padding-top: 3px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 4px 0 18px; }
+  select { font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-key { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .legend-key.call { background: var(--good); }
+  .legend-key.put { background: var(--critical); }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat .v.call { color: var(--good); }
+  .stat .v.put { color: var(--critical); }
+  .stat .l { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 8px; margin-bottom: 18px; }
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .zeroline { stroke: var(--text-muted); stroke-width: 1; }
+  .axis-label { font-size: 10.5px; fill: var(--text-muted); }
+  .bar-call { fill: var(--good); }
+  .bar-put { fill: var(--critical); }
+  .bar-hit { fill: transparent; cursor: pointer; }
+
+  .tooltip { position: absolute; pointer-events: none; z-index: 5; background: var(--text-primary); color: var(--page); border-radius: 8px; padding: 8px 11px; font-size: 12.5px; line-height: 1.5; opacity: 0; transform: translate(-50%, -100%); transition: opacity 0.1s ease; max-width: 280px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  .tooltip .tt-head { font-size: 11px; opacity: 0.7; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+  .tooltip .tt-row { display: flex; align-items: flex-start; gap: 7px; }
+  .tooltip .tt-row + .tt-row { margin-top: 2px; }
+  .tooltip .tt-key { width: 9px; height: 9px; border-radius: 2px; flex: none; margin-top: 4px; }
+  .tooltip .tt-val { font-weight: 700; margin-left: auto; text-align: right; word-break: break-word; }
+
+  .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 480px; }
+  thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.status-call { color: var(--good); font-weight: 600; }
+  td.status-put { color: var(--critical); font-weight: 600; }
+  td.status-none { color: var(--text-muted); }
+
+  .empty-note { border: 1px dashed var(--border); border-radius: 12px; padding: 16px 18px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+
+  footer { padding: 18px 0 8px; font-size: 13px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Signal History</h1>
+      <div class="sub">Overall Status per 4-min tick, 09:00&ndash;15:45 IST (includes preview days before live trading started)</div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Back to today</a>
+  </header>
+
+  <div class="controls">
+    <select id="daySelect" aria-label="Select day"></select>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-key call"></span>Call Buy</span>
+      <span class="legend-item"><span class="legend-key put"></span>Put Buy</span>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>
+    Reads signal_log.json from this folder &mdash; one entry per processed tick, appended automatically (de-duplicated
+    by date+time, so re-showing a preview day doesn't double-log it). Bar height is the signal's composite score
+    (needs &ge;8 to count as a signal; &ge;12 is Strong). Kept for the last 90 days.
+  </footer>
+</div>
+
+<script>
+const LOG_URL = "signal_log.json";
+let ALL_ENTRIES = [];
+
+function renderStats(dayEntries) {
+  const callN = dayEntries.filter(e => e.status === "Call Buy").length;
+  const putN = dayEntries.filter(e => e.status === "Put Buy").length;
+  const noneN = dayEntries.length - callN - putN;
+
+  const stats = [
+    ["Ticks logged", dayEntries.length, ""],
+    ["Call Buy ticks", callN, "call"],
+    ["Put Buy ticks", putN, "put"],
+    ["No Signal / Mixed", noneN, ""],
+  ];
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v" + (cls ? " " + cls : ""); v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+const tooltip = document.createElement("div");
+tooltip.className = "tooltip";
+document.body.appendChild(tooltip);
+function showTooltip(x, y, html) {
+  tooltip.innerHTML = "";
+  html.forEach(n => tooltip.appendChild(n));
+  tooltip.style.left = x + "px";
+  tooltip.style.top = (y - 10) + "px";
+  tooltip.style.opacity = "1";
+}
+function hideTooltip() { tooltip.style.opacity = "0"; }
+function ttRow(color, label, value) {
+  const row = document.createElement("div"); row.className = "tt-row";
+  const key = document.createElement("span"); key.className = "tt-key"; key.style.background = color;
+  const lab = document.createElement("span"); lab.textContent = label;
+  const val = document.createElement("span"); val.className = "tt-val"; val.textContent = value;
+  row.appendChild(key); row.appendChild(lab); row.appendChild(val);
+  return row;
+}
+
+function renderChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 320, padL = 30, padR = 14, padT = 14, padB = 30;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  const maxCount = Math.max(1, ...dayEntries.map(e => Math.max(e.call, e.put)));
+  const zeroY = padT + plotH / 2;
+  const scale = (plotH / 2 - 8) / maxCount;
+
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  [0, 0.5, 1].forEach(frac => {
+    const v = Math.round(maxCount * frac);
+    [zeroY - v * scale, zeroY + v * scale].forEach(y => {
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: v === 0 ? "zeroline" : "gridline" }));
+    });
+    if (v > 0) {
+      const labUp = el("text", { x: padL - 6, y: zeroY - v * scale + 3, class: "axis-label", "text-anchor": "end" });
+      labUp.textContent = v;
+      svg.appendChild(labUp);
+      const labDown = el("text", { x: padL - 6, y: zeroY + v * scale + 3, class: "axis-label", "text-anchor": "end" });
+      labDown.textContent = v;
+      svg.appendChild(labDown);
+    }
+  });
+
+  const n = dayEntries.length;
+  const slotW = plotW / n;
+  const barW = Math.min(20, slotW * 0.55);
+
+  dayEntries.forEach((e, i) => {
+    const cx = padL + slotW * i + slotW / 2;
+    const callH = e.call * scale, putH = e.put * scale;
+
+    const callBar = el("rect", { x: cx - barW / 2, y: zeroY - callH, width: barW, height: Math.max(0, callH), rx: 3, class: "bar-call" });
+    const putBar = el("rect", { x: cx - barW / 2, y: zeroY, width: barW, height: Math.max(0, putH), rx: 3, class: "bar-put" });
+    svg.appendChild(callBar); svg.appendChild(putBar);
+
+    const hit = el("rect", { x: cx - slotW / 2, y: padT, width: slotW, height: plotH, class: "bar-hit" });
+    hit.addEventListener("pointermove", (ev) => {
+      const r = svg.getBoundingClientRect();
+      const scaleX = r.width / W;
+      const rows = [
+        (() => { const h = document.createElement("div"); h.className = "tt-head"; h.textContent = e.time + " — " + e.status; return h; })(),
+        ttRow("var(--accent)", "Strike", e.strike ?? "—"),
+        ttRow("var(--text-muted)", "Confidence", e.confidence ?? "—"),
+        ttRow("var(--text-muted)", "Spot", e.spot),
+      ];
+      showTooltip(r.left + cx * scaleX, r.top + zeroY - Math.max(callH, 20) + window.scrollY, rows);
+    });
+    hit.addEventListener("pointerleave", hideTooltip);
+    svg.appendChild(hit);
+
+    if (i % 2 === 0 || n <= 16) {
+      const lab = el("text", { x: cx, y: H - 8, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time;
+      svg.appendChild(lab);
+    }
+  });
+
+  card.appendChild(svg);
+  return card;
+}
+
+function renderTable(dayEntries) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Status</th><th>Strike</th><th>Score</th><th>Confidence</th><th>Spot</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntries.slice().reverse().forEach(e => {
+    const tr = document.createElement("tr");
+    const statusCls = e.status === "Call Buy" ? "status-call" : e.status === "Put Buy" ? "status-put" : "status-none";
+    const timeTd = document.createElement("td"); timeTd.textContent = e.time;
+    const statusTd = document.createElement("td"); statusTd.className = statusCls; statusTd.textContent = e.status;
+    const strikeTd = document.createElement("td"); strikeTd.textContent = e.strike ?? "—";
+    const scoreTd = document.createElement("td"); scoreTd.textContent = e.score ?? "—";
+    const confTd = document.createElement("td"); confTd.textContent = e.confidence ?? "—";
+    const spotTd = document.createElement("td"); spotTd.textContent = e.spot;
+    tr.append(timeTd, statusTd, strikeTd, scoreTd, confTd, spotTd);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+  const dayEntries = ALL_ENTRIES.filter(e => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+
+  if (dayEntries.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderChart(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL_ENTRIES = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load signal_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+
+  if (ALL_ENTRIES.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No signal history yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+
+  const dates = Array.from(new Set(ALL_ENTRIES.map(e => e.date))).sort().reverse();
+  const select = document.getElementById("daySelect");
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+</script>
+</body>
+</html>
