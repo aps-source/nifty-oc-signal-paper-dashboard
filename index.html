@@ -1,49 +1,535 @@
-<!doctype html><html><head><meta charset="utf-8">
-<title>NIFTY OC Signal -- Paper Trade</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NIFTY Option-Chain Signal — Paper Trade</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-body{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:0 auto;padding:16px;
-background:#0B1220;color:#E5E7EB}
-.topbar{background:#111827;padding:8px 14px;margin:-16px -16px 16px;font-size:14px}
-.topbar a{color:#93C5FD;text-decoration:none}
-h1{font-size:22px} .muted{color:#9CA3AF;font-size:13px}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}
-.tile{background:#111827;border-radius:10px;padding:10px 12px}
-.tile .k{font-size:12px;color:#9CA3AF} .tile .v{font-size:18px;font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:13px}
-td,th{padding:6px 8px;border-bottom:1px solid #1F2937;text-align:left}
-img{width:100%;border-radius:8px;margin:10px 0}
-.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:600;font-size:13px}
-.preview{background:#78350F;color:#FEF3C7;padding:8px 12px;border-radius:8px;margin:10px 0;font-size:13px}
-</style></head><body>
+  :root {
+    color-scheme: light;
+    --page:           #eceff8;
+    --surface-1:      #ffffff;
+    --surface-2:      #f3f5fb;
+    --text-primary:   #0e1320;
+    --text-secondary: #4f5a74;
+    --text-muted:     #76829c;
+    --gridline:       #e2e7f1;
+    --border:         rgba(14,19,32,0.10);
+    --shadow:         0 1px 2px rgba(14,19,32,0.06), 0 8px 24px rgba(40,50,110,0.08);
+
+    --brand-a:        #4338ca;
+    --brand-b:        #7c3aed;
+    --brand-c:        #0d9488;
+    --accent:         #4f46e5;
+
+    --call:           #2563eb;
+    --put:            #d6336c;
+
+    --good:           #12a150;
+    --warning:        #c77d00;
+    --critical:       #dc3545;
+    --slate-1:        #1b2340;
+    --slate-2:        #2d3a66;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page:           #090c14;
+      --surface-1:      #131a29;
+      --surface-2:      #1a2336;
+      --text-primary:   #eef1f9;
+      --text-secondary: #a0abc4;
+      --text-muted:     #7f8aa3;
+      --gridline:       #253048;
+      --border:         rgba(238,241,249,0.11);
+      --shadow:         0 1px 2px rgba(0,0,0,0.4), 0 10px 28px rgba(0,0,0,0.35);
+
+      --brand-a:        #4f46e5;
+      --brand-b:        #8b5cf6;
+      --brand-c:        #14b8a6;
+      --accent:         #9b8cf3;
+
+      --call:           #4a8cf0;
+      --put:            #e0578a;
+
+      --good:           #2bc85a;
+      --warning:        #f2b636;
+      --critical:       #f0645f;
+      --slate-1:        #0f1630;
+      --slate-2:        #26305a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { font-size: clamp(15px, 0.55vw + 9px, 19px); }
+  body {
+    margin: 0; color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.4;
+    background:
+      radial-gradient(1100px 480px at 8% -8%, color-mix(in srgb, var(--brand-b) 16%, transparent), transparent 70%),
+      radial-gradient(900px 480px at 100% 0%, color-mix(in srgb, var(--brand-c) 14%, transparent), transparent 70%),
+      var(--page);
+    background-attachment: fixed;
+  }
+  .muted { color: var(--text-muted); }
+  b { font-variant-numeric: tabular-nums; }
+
+  .hero {
+    background: linear-gradient(115deg, var(--brand-a) 0%, var(--brand-b) 52%, var(--brand-c) 100%);
+    color: #fff; padding: 1.05rem clamp(14px, 2vw, 32px) 0.9rem;
+    box-shadow: 0 6px 26px rgba(67,56,202,0.28);
+  }
+  .hero-inner { max-width: 1500px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 0.9rem; }
+  .logo { width: 2.5rem; height: 2.5rem; border-radius: 0.8rem; background: rgba(255,255,255,0.18); display: grid; place-items: center; font-size: 1.35rem; backdrop-filter: blur(4px); }
+  h1 { font-size: 1.45rem; margin: 0; font-weight: 800; letter-spacing: -0.015em; }
+  .tag { font-size: 0.86rem; opacity: 0.88; margin-top: 1px; }
+  .hero-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .hero-pill { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); padding: 0.32rem 0.75rem; border-radius: 999px; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+  a.btn { background: #fff; color: var(--brand-a); text-decoration: none; font-weight: 700; font-size: 0.88rem; padding: 0.45rem 0.95rem; border-radius: 999px; box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
+  a.btn:hover { transform: translateY(-1px); }
+  .live-clock { text-align: right; font-variant-numeric: tabular-nums; }
+  .live-clock .d { font-size: 0.86rem; font-weight: 700; }
+  .live-clock .t { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.01em; }
+  details.rules { max-width: 1500px; margin: 0.55rem auto 0; font-size: 0.83rem; opacity: 0.95; }
+  details.rules summary { cursor: pointer; font-weight: 600; width: fit-content; }
+  details.rules p { margin: 0.4rem 0 0; max-width: 1100px; opacity: 0.92; }
+
+  .page { max-width: 1500px; margin: 0 auto; padding: 1.1rem clamp(14px, 2vw, 32px) 2rem; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(165px, 100%), 1fr)); gap: 0.9rem; margin-bottom: 1rem; }
+  .kpi {
+    position: relative; overflow: hidden; background: var(--surface-1); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 0.95rem 1.1rem; box-shadow: var(--shadow);
+  }
+  .kpi::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--kc, var(--accent)); }
+  .kpi .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; }
+  .kpi .v { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 0.1rem; line-height: 1.15; }
+  .kpi .s { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.15rem; }
+  .kpi.hero-kpi { background: linear-gradient(135deg, color-mix(in srgb, var(--kc) 20%, var(--surface-1)), var(--surface-1) 70%); }
+  .kpi.good { --kc: var(--good); } .kpi.bad { --kc: var(--critical); } .kpi.warn { --kc: var(--warning); }
+  .kpi.blue { --kc: var(--call); } .kpi.pink { --kc: var(--put); } .kpi.teal { --kc: var(--brand-c); }
+  .v.good { color: var(--good); } .v.bad { color: var(--critical); } .v.warn { color: var(--warning); }
+
+  .st-pill { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; font-size: 0.78rem; padding: 0.15rem 0.55rem; border-radius: 999px; margin-right: 0.35rem; }
+  .st-pill.live { background: color-mix(in srgb, var(--good) 16%, var(--surface-1)); color: var(--good); }
+  .st-pill.stale { background: color-mix(in srgb, var(--critical) 16%, var(--surface-1)); color: var(--critical); }
+  .st-pill.preview { background: color-mix(in srgb, var(--warning) 18%, var(--surface-1)); color: var(--warning); }
+  .dot { display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: currentColor; flex: none; }
+  .st-pill.live .dot { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); } 60% { box-shadow: 0 0 0 6px transparent; } }
+
+  .decisions { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 0.9rem; margin-bottom: 1rem; }
+  .decision {
+    display: flex; align-items: center; gap: 1rem; padding: 1rem 1.3rem; border-radius: 1.1rem; color: #fff;
+    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.14);
+  }
+  .decision .glyph { width: 3.1rem; height: 3.1rem; border-radius: 50%; background: rgba(255,255,255,0.2); display: grid; place-items: center; font-size: 1.5rem; font-weight: 800; flex: none; }
+  .decision .mi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.9; font-weight: 700; }
+  .decision .mi-action { font-size: 1.75rem; font-weight: 800; letter-spacing: 0.005em; line-height: 1.15; }
+  .decision .mi-meta { font-size: 0.85rem; opacity: 0.92; margin-top: 0.15rem; }
+  .decision.CE { background: linear-gradient(120deg, color-mix(in srgb, var(--call) 72%, #000), var(--call)); }
+  .decision.PE { background: linear-gradient(120deg, color-mix(in srgb, var(--put) 72%, #000), var(--put)); }
+  .decision.PENDING { background: linear-gradient(120deg, var(--slate-1), var(--slate-2)); }
+  .decision.PENDING .glyph { background: rgba(255,255,255,0.12); }
+
+  .layout { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .side { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); align-content: start; }
+  @media (min-width: 1040px) { .layout { grid-template-columns: 22rem minmax(0, 1fr); } .side { position: sticky; top: 1rem; grid-template-columns: minmax(0, 1fr); } }
+  #root { min-width: 0; }
+
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 1rem; padding: 1.05rem 1.2rem; box-shadow: var(--shadow); }
+  .card h2, .box h3 { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 0 0 0.7rem; font-weight: 800; }
+
+  .panel { display: grid; gap: 0.85rem; align-content: start; min-width: 0; }
+  .panel-head { border-radius: 1rem; padding: 0.85rem 1.15rem; color: #fff; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 88%, #000), var(--accent) 60%, color-mix(in srgb, var(--accent) 60%, var(--brand-c))); }
+  .inst-name { font-size: 1.25rem; font-weight: 800; letter-spacing: 0.01em; }
+  .spot-big { font-size: 1.75rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; text-align: right; }
+  .spot-big small { display: block; font-size: 0.72rem; font-weight: 600; opacity: 0.9; }
+  .panel-head .st-pill { background: rgba(255,255,255,0.2); color: #fff; margin: 0.25rem 0 0; }
+  .panel-head .stline { font-size: 0.78rem; opacity: 0.95; margin-top: 0.25rem; }
+
+  .box { background: var(--surface-1); border: 1px solid var(--border); border-radius: 1rem; padding: 0.95rem 1.1rem; box-shadow: var(--shadow); }
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; }
+
+  .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+  .tile { border-radius: 0.9rem; padding: 0.65rem 0.8rem; background: var(--surface-2); border: 1px solid var(--border); min-width: 0; }
+  .tile .v { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.15; white-space: nowrap; }
+  .tile .k { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-top: 2px; }
+  .tile .v.good { color: var(--good); } .tile .v.bad { color: var(--critical); }
+  @media (max-width: 480px) { .tile { padding: 0.55rem 0.55rem; } .tile .v { font-size: 1.02rem; } .tile .k { font-size: 0.6rem; letter-spacing: 0.03em; } }
+
+  .pos-empty { color: var(--text-muted); font-size: 0.92rem; }
+  .pos-side { font-size: 1.4rem; font-weight: 800; }
+  .pos-side.CE { color: var(--call); } .pos-side.PE { color: var(--put); }
+  .pos-meta { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+  .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 560px) { .checklist-grid { grid-template-columns: 1fr; } }
+  .chead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+  .cname { font-weight: 800; font-size: 0.95rem; }
+  .ccol.ce .cname { color: var(--call); } .ccol.pe .cname { color: var(--put); }
+  .cscore { font-size: 0.75rem; font-weight: 800; padding: 0.12rem 0.55rem; border-radius: 999px; background: var(--surface-2); color: var(--text-secondary); }
+  .ccol.ce .cscore.full { background: var(--call); color: #fff; } .ccol.pe .cscore.full { background: var(--put); color: #fff; }
+  .segs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; margin-bottom: 0.45rem; }
+  .segs i { height: 0.42rem; border-radius: 999px; background: var(--gridline); display: block; }
+  .ccol.ce .segs i.on { background: var(--call); } .ccol.pe .segs i.on { background: var(--put); }
+  .crit-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; font-size: 0.86rem; color: var(--text-muted); padding: 0.28rem 0; border-top: 1px solid var(--gridline); }
+  .crit-row:first-of-type { border-top: none; }
+  .crit-row b { font-weight: 700; }
+  .na-note { color: var(--text-muted); font-size: 0.82rem; padding: 0.2rem 0 0.5rem; }
+
+  .ladder { position: relative; height: 3.6rem; margin: 0.4rem 0.4rem 0.2rem; }
+  .ladder .track { position: absolute; left: 0; right: 0; top: 1.55rem; height: 0.7rem; border-radius: 999px; background: linear-gradient(90deg, var(--good), var(--warning) 50%, var(--critical)); opacity: 0.9; }
+  .ladder .mk { position: absolute; top: 1.3rem; width: 0.4rem; height: 1.2rem; border-radius: 3px; background: var(--surface-1); border: 2px solid var(--text-primary); transform: translateX(-50%); }
+  .ladder .spot { position: absolute; top: 0; transform: translateX(-50%); text-align: center; font-weight: 800; font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
+  .ladder .spot::after { content: "▼"; display: block; font-size: 0.7rem; line-height: 0.8; margin-top: 1px; }
+  .ladder .tick { position: absolute; top: 2.55rem; transform: translateX(-50%); font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); }
+  .lvl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-top: 0.6rem; }
+  .lvl { border-radius: 0.75rem; padding: 0.5rem 0.7rem; background: var(--surface-2); border-left: 4px solid var(--c, var(--text-muted)); }
+  .lvl .l { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; }
+  .lvl .n { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .lvl .d { font-size: 0.72rem; color: var(--text-secondary); }
+  .lvl.res { --c: var(--critical); } .lvl.mp { --c: var(--warning); } .lvl.sup { --c: var(--good); } .lvl.pcr { --c: var(--brand-c); }
+  .suggest { display: inline-block; font-weight: 800; padding: 0.1rem 0.6rem; border-radius: 999px; }
+  .suggest.CALL { background: color-mix(in srgb, var(--call) 16%, var(--surface-1)); color: var(--call); }
+  .suggest.PUT { background: color-mix(in srgb, var(--put) 16%, var(--surface-1)); color: var(--put); }
+  .suggest.NEUTRAL { background: var(--surface-2); color: var(--text-muted); }
+  .disclaimer { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 0.6rem; }
+
+  img.daychart { width: 100%; border-radius: 0.8rem; display: block; margin-top: 0.3rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  th { text-align: left; color: var(--text-muted); font-weight: 700; padding: 0.4rem 0.4rem; border-bottom: 2px solid var(--gridline); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .empty-row td { color: var(--text-muted); text-align: center; padding: 1.1rem 0.4rem; }
+  .side-pill { font-weight: 800; font-size: 0.72rem; padding: 0.12rem 0.55rem; border-radius: 999px; color: #fff; }
+  .side-pill.CE { background: var(--call); } .side-pill.PE { background: var(--put); }
+  .reason { font-size: 0.74rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--surface-2); color: var(--text-secondary); }
+  .pos-pnl-cell { color: var(--good); font-weight: 700; } .neg-pnl-cell { color: var(--critical); font-weight: 700; }
+
+  .spark svg { width: 100%; height: 4.2rem; display: block; }
+  .spark-cap { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.3rem; }
+
+  .preview-banner { background: color-mix(in srgb, var(--warning) 18%, var(--surface-1)); border: 1px solid var(--warning); color: var(--text-primary); border-radius: 0.9rem; padding: 0.7rem 1rem; margin-bottom: 1rem; font-size: 0.88rem; }
+
+  footer { margin-top: 1.4rem; font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+</style>
+</head>
+<body>
 <!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
 
-<h1>NIFTY Option-Chain Signal -- Paper Trade</h1>
-<p class="muted">Confirmation model (5m/15m/60m price+OI+IV weighted score). PAPER ONLY, no real orders.
-Backtest on 10 prior sessions showed ~coin-flip win rate (48-57%) -- treat every number below as a live
-continuation of that test, not a validated edge. Live paper trading starts 2026-10-12. Last updated 2026-10-10 21:30:58.</p>
-<div class="preview">Preview -- showing the last available session (2026-10-09). No position is open; trading starts 2026-10-12.</div>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand">
+      <div class="logo">◆</div>
+      <div>
+        <h1>NIFTY Option-Chain Signal</h1>
+        <div class="tag">Multi-timeframe price + OI + IV confirmation &middot; PAPER ONLY &middot; 1 lot</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="live-clock"><div class="d" id="live-clock-date">—</div><div class="t" id="live-clock-time">—</div></div>
+      <span class="hero-pill" id="clock">loading…</span>
+      <a class="btn" href="trades.html">Full trade log &rarr;</a>
+    </div>
+  </div>
+  <details class="rules">
+    <summary>Model rules &amp; backtest result</summary>
+    <p>Per strike/side/timeframe (5m/15m/60m): price move &ge;0.5% sets direction, +1 each if OI and IV confirm
+    same-direction &ge;0.5%, score -3..+3. Composite = 5m + 2&times;15m + 3&times;60m. Call/Put Buy needs
+    composite &ge;8 and &ge;3 clear of the other side. Entry: 1 lot of the Strongest Strike at signal. Exit: opposite
+    signal (reverse) or forced close at day end. No stop-loss or target.
+    <b>Backtested across 10 prior sessions: ~coin-flip win rate (47-57%) at every horizon, both sides — no edge found.</b>
+    This paper loop is a live continuation of that same test, not a validated strategy.</p>
+  </details>
+</header>
 
-<div class="tiles">
-  <div class="tile"><div class="k">Overall Status</div><div class="v" style="color:#6B7280">No Signal</div></div>
-  <div class="tile"><div class="k">Strongest Strike</div><div class="v">--</div></div>
-  <div class="tile"><div class="k">Confidence</div><div class="v">--</div></div>
-  <div class="tile"><div class="k">Data Quality</div><div class="v">Partial history</div></div>
-  <div class="tile"><div class="k">PCR (OI)</div><div class="v">1.12</div></div>
-  <div class="tile"><div class="k">Resistance</div><div class="v">23000 <span class="muted">14.5M OI</span></div></div>
-  <div class="tile"><div class="k">Support</div><div class="v">22500 <span class="muted">13.2M OI</span></div></div>
-  <div class="tile"><div class="k">Max Pain</div><div class="v">22500</div></div>
-  <div class="tile"><div class="k">ATM Straddle OI</div><div class="v">23.1M</div></div>
-</div>
+<main class="page">
+  <div id="preview-banner"></div>
+  <section class="kpis" id="kpis"></section>
+  <section class="decisions" id="decision"></section>
 
-<h2>Position</h2>
-<p>Flat -- no open position.</p>
+  <div class="layout">
+    <aside class="side">
+      <div class="card" id="levels-card">
+        <h2>Market levels &middot; NIFTY option-chain</h2>
+        <div id="oi-summary"></div>
+        <div class="disclaimer">PCR-based suggestion is a reference indicator only — backtest found no predictive
+        edge from PCR, OI walls or max-pain on their own. Shown for context, not as a signal.</div>
+      </div>
+    </aside>
+    <div id="root"></div>
+  </div>
 
-<h2>Today's chart</h2>
-<img src="charts/chart_latest.png" alt="today's NIFTY spot vs signal chart">
+  <footer>
+    Reads live_state.json from this same site every 30s, pushed by the paper loop every 4 min, 09:19&ndash;15:47 IST
+    weekdays. Read-only — never places, modifies or cancels any order, paper or real.
+  </footer>
+</main>
 
-<h2>Recent trades <span class="muted">(0 total, 0% win, +0.0 net pts)</span> -- <a href="trades.html" style="color:#93C5FD">full log</a></h2>
-<table><tr><th>Date</th><th>Expiry</th><th>Side</th><th>Strike</th><th>Entry time</th><th>Buy px</th><th>Exit time</th><th>Sell px</th><th>Reason</th><th>Diff pts</th><th>Gain/Loss Rs</th></tr>
-<tr><td colspan='11'>No trades yet.</td></tr>
-</table>
-</body></html>
+<script>
+const REFRESH_MS = 30 * 1000;
+const STATE_URL = "live_state.json";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rs = (v) => (v >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
+const tm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" }) : "—";
+const dtm = (iso) => iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—";
+
+function ageMinutes(state) {
+  const lt = state && state.as_of ? new Date(state.as_of) : null;
+  return lt ? (Date.now() - lt.getTime()) / 60000 : Infinity;
+}
+
+function statusPill(state) {
+  if (state.is_preview) return { cls: "preview", label: "Preview", line: `preview of ${state.preview_date} — live trading starts ${state.start_date}` };
+  const ageMin = ageMinutes(state);
+  if (ageMin > 20) return { cls: "stale", label: "Stale", line: `stale (${Math.round(ageMin)} min since last tick — market may be closed, or the loop isn't running)` };
+  return { cls: "live", label: "Live", line: "live" };
+}
+
+/* ------------------------------ sparkline ------------------------------ */
+function sparkline(trades) {
+  if (!trades.length) return `<div class="pos-empty">No closed trades yet today</div>`;
+  const pts = [0];
+  let c = 0;
+  trades.forEach((t) => { c += Number(t.pnl_rs) || 0; pts.push(c); });
+  const w = 260, h = 70, p = 8;
+  const mn = Math.min(0, ...pts), mx = Math.max(0, ...pts), rng = (mx - mn) || 1;
+  const x = (i) => p + (w - 2 * p) * (i / (pts.length - 1 || 1));
+  const y = (v) => h - p - (h - 2 * p) * ((v - mn) / rng);
+  const line = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(pts.length - 1).toFixed(1)},${y(0).toFixed(1)} L${x(0).toFixed(1)},${y(0).toFixed(1)} Z`;
+  const col = c >= 0 ? "var(--good)" : "var(--critical)";
+  return `
+    <div class="spark">
+      <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Cumulative P&L today">
+        <line x1="${p}" y1="${y(0)}" x2="${w - p}" y2="${y(0)}" stroke="var(--gridline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="${area}" fill="${col}" opacity="0.14"/>
+        <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(c).toFixed(1)}" r="4.5" fill="${col}" stroke="var(--surface-1)" stroke-width="2"/>
+      </svg>
+      <div class="spark-cap"><span>${trades.length} closed trade${trades.length > 1 ? "s" : ""}</span><b style="color:${col}">${rs(c)}</b></div>
+    </div>`;
+}
+
+/* ------------------------------ checklist (why did/didn't it fire) ------------------------------ */
+function segRow(label, pts) {
+  return `<div class="crit-row"><span>${label}</span><b>${pts > 0 ? "+" + pts : pts}</b></div>`;
+}
+function checkCol(name, side, cl) {
+  if (!cl) return `<div class="ccol ${side}"><div class="chead"><span class="cname">${name}</span></div><div class="na-note">No data</div></div>`;
+  const full = Math.abs(cl.composite) >= 8;
+  const segs = ["5m", "15m", "60m"].map((k) => `<i class="${cl[k] ? "on" : ""}"></i>`).join("");
+  return `
+    <div class="ccol ${side}">
+      <div class="chead"><span class="cname">${name}</span><span class="cscore ${full ? "full" : ""}">${cl.composite}${full ? " · SIGNAL" : ""}</span></div>
+      <div class="segs">${segs}</div>
+      ${segRow("5-min score", cl["5m"])}
+      ${segRow("15-min score", cl["15m"])}
+      ${segRow("60-min score", cl["60m"])}
+    </div>`;
+}
+
+/* ------------------------------ market levels ladder ------------------------------ */
+function renderLevels(state) {
+  const oi = state.oi_metrics;
+  if (!oi) { $("oi-summary").innerHTML = '<div class="pos-empty">No data</div>'; return; }
+
+  const vals = [oi.support_strike, oi.max_pain, oi.resistance_strike, oi.spot].map(Number).filter(Number.isFinite);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo) * 0.10 || 50;
+  const a = lo - pad, b = hi + pad;
+  const pos = (v) => Math.min(98, Math.max(2, ((Number(v) - a) / (b - a)) * 100));
+  const gap = (v) => {
+    const g = ((Number(v) - Number(oi.spot)) / Number(oi.spot)) * 100;
+    return `${Math.abs(g).toFixed(2)}% ${g >= 0 ? "above" : "below"} spot`;
+  };
+
+  $("oi-summary").innerHTML = `
+    <div class="ladder">
+      <div class="track"></div>
+      <div class="spot" style="left:${pos(oi.spot)}%">${oi.spot}</div>
+      <div class="mk" style="left:${pos(oi.spot)}%; border-color:var(--accent);"></div>
+      <div class="mk" style="left:${pos(oi.support_strike)}%"></div><div class="tick" style="left:${pos(oi.support_strike)}%">S</div>
+      <div class="mk" style="left:${pos(oi.max_pain)}%"></div><div class="tick" style="left:${pos(oi.max_pain)}%">MP</div>
+      <div class="mk" style="left:${pos(oi.resistance_strike)}%"></div><div class="tick" style="left:${pos(oi.resistance_strike)}%">R</div>
+    </div>
+    <div class="lvl-grid">
+      <div class="lvl res"><div class="l">Resistance &middot; max Call OI</div><div class="n">${oi.resistance_strike}</div><div class="d">${gap(oi.resistance_strike)} &middot; ${(oi.resistance_oi/1e6).toFixed(1)}M OI</div></div>
+      <div class="lvl sup"><div class="l">Support &middot; max Put OI</div><div class="n">${oi.support_strike}</div><div class="d">${gap(oi.support_strike)} &middot; ${(oi.support_oi/1e6).toFixed(1)}M OI</div></div>
+      <div class="lvl mp"><div class="l">Max pain</div><div class="n">${oi.max_pain}</div><div class="d">${gap(oi.max_pain)}</div></div>
+      <div class="lvl pcr"><div class="l">PCR</div><div class="n">${oi.pcr ?? "—"}</div><div class="d">Suggests <span class="suggest ${oi.pcr_suggestion}">${oi.pcr_suggestion}</span></div></div>
+    </div>`;
+}
+
+/* ------------------------------ decision banner ------------------------------ */
+function decisionHtml(kind, glyph, label, action, meta) {
+  return `
+    <div class="decision ${kind}">
+      <div class="glyph">${glyph}</div>
+      <div>
+        <div class="mi-label">${label}</div>
+        <div class="mi-action">${action}</div>
+        <div class="mi-meta">${meta}</div>
+      </div>
+    </div>`;
+}
+function renderDecision(state) {
+  const el = $("decision");
+  if (state.is_preview) {
+    el.innerHTML = decisionHtml("PENDING", "…", `Preview of ${state.preview_date}`, "NOT TRADING YET", `Live paper trading starts ${state.start_date}`);
+    return;
+  }
+  if (state.position) {
+    const p = state.position;
+    el.innerHTML = decisionHtml(p.side, p.side === "CE" ? "▲" : "▼", "Holding", `${p.side} ${p.strike}`, `Entered ${tm(p.entry_time)} @ ${p.entry_price} — exits on opposite signal or day close`);
+    return;
+  }
+  if (state.overall === "Call Buy" || state.overall === "Put Buy") {
+    const side = state.overall === "Call Buy" ? "CE" : "PE";
+    el.innerHTML = decisionHtml(side, side === "CE" ? "▲" : "▼", `Signal live as of ${tm(state.as_of)}`, `${state.overall} (Strongest Strike)`, `Strike ${state.strongest_strike} — Spot ${state.spot} — ${state.confidence}`);
+    return;
+  }
+  el.innerHTML = decisionHtml("PENDING", "…", `As of ${tm(state.as_of)}`, state.overall || "No Signal", `Spot ${state.spot} — flat, waiting for a new signal`);
+}
+
+/* ------------------------------ main panel ------------------------------ */
+function renderPanel(state) {
+  const st = statusPill(state);
+  const errorHtml = "";
+
+  let posHtml;
+  if (state.position) {
+    const p = state.position;
+    posHtml = `
+      <div class="pos-side ${p.side}">${p.side} ${p.strike}</div>
+      <div class="pos-meta">Entered ${tm(p.entry_time)} @ ${p.entry_price} &middot; qty ${p.qty} &middot; expiry ${p.expiry}</div>
+      <div class="pos-meta">Last ${p.last_known_price} (${(p.last_known_price - p.entry_price >= 0 ? "+" : "")}${(p.last_known_price - p.entry_price).toFixed(2)} pts)</div>`;
+  } else {
+    posHtml = '<span class="pos-empty">No open position</span>';
+  }
+
+  const cl = state.checklist;
+  const checklistHtml = cl ? `
+    <div class="box">
+      <h3>Signal checklist &middot; strike ${cl.strike}</h3>
+      <div class="checklist-grid">
+        ${checkCol("Call (CE)", "ce", cl.ce)}
+        ${checkCol("Put (PE)", "pe", cl.pe)}
+      </div>
+      <div class="na-note">Needs composite &ge;8 and &ge;3 clear of the other side to fire. Strike shown: the
+      Strongest Strike when a signal is live, otherwise ATM.</div>
+    </div>` : "";
+
+  const closed = (state.today_trades || []).slice().reverse();
+  const tradesHtml = closed.length
+    ? closed.map((t) => `
+      <tr>
+        <td>${tm(t.entry_time)}&ndash;${tm(t.exit_time)}</td>
+        <td><span class="side-pill ${t.side}">${t.side}</span></td>
+        <td>${t.strike}</td>
+        <td>${t.entry_price} &rarr; ${t.exit_price}</td>
+        <td><span class="reason">${esc(t.reason)}</span></td>
+        <td class="${t.pnl_rs >= 0 ? "pos-pnl-cell" : "neg-pnl-cell"}">${rs(t.pnl_rs)}</td>
+      </tr>`).join("")
+    : '<tr class="empty-row"><td colspan="6">No trades yet today</td></tr>';
+
+  const realized = Number(state.realized_pnl_today) || 0;
+
+  return `
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="inst-name">NIFTY</div>
+          <span class="st-pill ${st.cls}"><span class="dot"></span>${st.label}</span>
+          <div class="stline">As of <b>${dtm(state.as_of)}</b> &middot; ${st.line}</div>
+        </div>
+        <div class="spot-big">${state.spot}<small>spot &middot; ATM ${state.atm}</small></div>
+      </div>
+      ${errorHtml}
+      <div class="box">
+        <div class="tiles">
+          <div class="tile"><div class="v">${state.trades_today}</div><div class="k">Trades today</div></div>
+          <div class="tile"><div class="v ${realized >= 0 ? "good" : "bad"}">${rs(realized)}</div><div class="k">Realized P&amp;L today</div></div>
+        </div>
+      </div>
+      <div class="split">
+        <div class="box"><h3>Position</h3>${posHtml}</div>
+        <div class="box"><h3>Today's P&amp;L curve</h3>${sparkline(closed)}</div>
+      </div>
+      ${checklistHtml}
+      <div class="box">
+        <h3>Today's chart</h3>
+        <img class="daychart" src="charts/chart_latest.png" alt="NIFTY spot vs signal, today">
+      </div>
+      <div class="box">
+        <h3>Trade log (today)</h3>
+        <table>
+          <thead><tr><th>Time</th><th>Side</th><th>Strike</th><th>Px</th><th>Reason</th><th>P&amp;L</th></tr></thead>
+          <tbody>${tradesHtml}</tbody>
+        </table>
+      </div>
+    </section>`;
+}
+
+/* ------------------------------ KPI strip ------------------------------ */
+function renderKpis(state) {
+  const st = statusPill(state);
+  const realized = Number(state.realized_pnl_today) || 0;
+  const open = state.position;
+  const allTime = state.all_time || {};
+
+  $("kpis").innerHTML = `
+    <div class="kpi hero-kpi ${realized >= 0 ? "good" : "bad"}">
+      <div class="k">Realized P&amp;L today</div>
+      <div class="v ${realized >= 0 ? "good" : "bad"}">${rs(realized)}</div>
+      <div class="s">${state.trades_today} trade${state.trades_today === 1 ? "" : "s"} today</div>
+    </div>
+    <div class="kpi ${open ? (open.side === "CE" ? "blue" : "pink") : "teal"}"><div class="k">Open position</div><div class="v">${open ? open.side + " " + open.strike : "Flat"}</div><div class="s">${open ? `entered ${tm(open.entry_time)}` : "no position"}</div></div>
+    <div class="kpi ${st.cls === "live" ? "good" : st.cls === "preview" ? "warn" : "bad"}"><div class="k">Status</div><div class="v" style="font-size:1.1rem;"><span class="st-pill ${st.cls}"><span class="dot"></span>${st.label}</span></div><div class="s">as of ${tm(state.as_of)}</div></div>
+    <div class="kpi"><div class="k">Overall signal</div><div class="v" style="font-size:1.1rem;">${state.overall}</div><div class="s">${state.confidence || "—"} &middot; strike ${state.strongest_strike ?? "—"}</div></div>
+    <div class="kpi ${(allTime.win_pct ?? 50) >= 50 ? "good" : "warn"}"><div class="k">All-time (paper)</div><div class="v" style="font-size:1.1rem;">${allTime.trades ?? 0} trades</div><div class="s">${allTime.win_pct != null ? allTime.win_pct.toFixed(0) + "% win" : "—"} &middot; ${(allTime.net_points ?? 0).toFixed(1)} pts</div></div>
+    <div class="kpi warn"><div class="k">Backtest context</div><div class="v" style="font-size:1.1rem;">47&ndash;57%</div><div class="s">win rate, 10 sessions &mdash; coin-flip, no edge found</div></div>
+  `;
+}
+
+/* ------------------------------ refresh loop ------------------------------ */
+async function refresh() {
+  let state;
+  try {
+    const res = await fetch(STATE_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    state = await res.json();
+  } catch (e) {
+    $("root").innerHTML = `<div class="card"><span class="pos-empty">Failed to load live_state.json — ${esc(e.message)}</span></div>`;
+    return;
+  }
+
+  $("preview-banner").innerHTML = state.is_preview
+    ? `<div class="preview-banner">Preview — showing the last available session (${state.preview_date}). No position is open. Live paper trading starts <b>${state.start_date}</b>.</div>`
+    : "";
+
+  renderKpis(state);
+  renderDecision(state);
+  renderLevels(state);
+  $("root").innerHTML = renderPanel(state);
+
+  $("clock").textContent = "Updated " + new Date().toLocaleTimeString("en-IN") + " · refreshes every 30s";
+}
+
+refresh();
+setInterval(refresh, REFRESH_MS);
+
+function tickLiveClock() {
+  const now = new Date();
+  document.getElementById("live-clock-date").textContent = now.toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+  document.getElementById("live-clock-time").textContent = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }) + " IST";
+}
+tickLiveClock();
+setInterval(tickLiveClock, 1000);
+</script>
+</body>
+</html>
