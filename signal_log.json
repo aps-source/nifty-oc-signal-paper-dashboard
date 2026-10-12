@@ -977,5 +977,27 @@
     "score": null,
     "confidence": null,
     "spot": 22520.45
+  },
+  {
+    "date": "2026-10-12",
+    "time": "09:15",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22604.85
+  },
+  {
+    "date": "2026-10-12",
+    "time": "09:19",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22599.3
   }
 ]
