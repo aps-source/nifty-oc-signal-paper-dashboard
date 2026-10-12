@@ -1076,5 +1076,38 @@
     "score": 8.0,
     "confidence": "Moderate",
     "spot": 22532.15
+  },
+  {
+    "date": "2026-10-12",
+    "time": "09:51",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 8.0,
+    "strike": 22450.0,
+    "score": 8.0,
+    "confidence": "Moderate",
+    "spot": 22503.95
+  },
+  {
+    "date": "2026-10-12",
+    "time": "09:55",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22486.7
+  },
+  {
+    "date": "2026-10-12",
+    "time": "09:59",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22507.6
   }
 ]
