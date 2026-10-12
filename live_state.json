@@ -1,6 +1,6 @@
 {
   "as_of": "2026-10-12T15:43:03+05:30",
-  "generated_at": "2026-10-12T22:15:22.439416",
+  "generated_at": "2026-10-12T22:23:22.862782",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -38,8 +38,8 @@
     "atm_straddle_oi": 13816075.0
   },
   "position": null,
-  "trades_today": 8,
-  "realized_pnl_today": -523.25,
+  "trades_today": 7,
+  "realized_pnl_today": -253.5,
   "today_trades": [
     {
       "date": "2026-10-12",
@@ -131,24 +131,11 @@
       "reason": "reversal",
       "pnl_pts": 14.9,
       "pnl_rs": 968.5
-    },
-    {
-      "date": "2026-10-12",
-      "entry_time": "2026-10-12T15:31:10+05:30",
-      "exit_time": "2026-10-12T15:43:03+05:30",
-      "side": "CE",
-      "strike": 21950.0,
-      "expiry": "2026-10-13",
-      "entry_price": 395.6,
-      "exit_price": 391.45,
-      "reason": "EOD",
-      "pnl_pts": -4.15,
-      "pnl_rs": -269.75
     }
   ],
   "all_time": {
-    "trades": 8,
-    "win_pct": 25.0,
-    "net_points": -8.049999999999999
+    "trades": 7,
+    "win_pct": 28.57142857142857,
+    "net_points": -3.9000000000000004
   }
 }
