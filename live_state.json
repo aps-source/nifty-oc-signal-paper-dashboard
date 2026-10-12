@@ -1,18 +1,18 @@
 {
-  "as_of": "2026-10-12T13:43:03+05:30",
-  "generated_at": "2026-10-12T13:47:09.661202",
+  "as_of": "2026-10-12T13:47:02+05:30",
+  "generated_at": "2026-10-12T13:51:10.927916",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 22362.15,
+  "spot": 22359.6,
   "atm": 22350.0,
   "overall": "Put Buy",
-  "strongest_strike": 22350.0,
+  "strongest_strike": 22150.0,
   "strongest_score": 14.0,
   "confidence": "Strong",
   "data_quality": "Complete",
   "checklist": {
-    "strike": 22350.0,
+    "strike": 22150.0,
     "ce": {
       "5m": -2.0,
       "15m": -2.0,
@@ -27,15 +27,15 @@
     }
   },
   "oi_metrics": {
-    "spot": 22362.15,
+    "spot": 22359.6,
     "resistance_strike": 22500.0,
-    "resistance_oi": 26765830.0,
+    "resistance_oi": 26482950.0,
     "support_strike": 22300.0,
-    "support_oi": 18455775.0,
+    "support_oi": 18481255.0,
     "max_pain": 22400.0,
-    "pcr": 0.838,
+    "pcr": 0.834,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 21655205.0
+    "atm_straddle_oi": 21927815.0
   },
   "position": {
     "side": "PE",
