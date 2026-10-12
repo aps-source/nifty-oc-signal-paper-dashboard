@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "date": "2026-10-12",
+    "expiry": "2026-10-13",
+    "side": "PE",
+    "strike": 22150.0,
+    "entry_time": "2026-10-12T09:27:03+05:30",
+    "exit_time": "2026-10-12T12:19:03+05:30",
+    "entry_price": 11.4,
+    "exit_price": 22.85,
+    "reason": "reversal",
+    "pnl_pts": 11.45,
+    "pnl_rs": 744.25
+  }
+]
