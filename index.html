@@ -469,7 +469,7 @@ function renderPanel(state) {
       ${checklistHtml}
       <div class="box">
         <div class="chead"><h3 style="margin:0;">Today's chart</h3><button class="fs-btn" id="chart-fs-btn" title="Full screen">&#9974; Full screen</button></div>
-        <div class="chart-frame" id="chart-frame"><img class="daychart" id="chart-img" src="charts/chart_latest.png" alt="NIFTY spot vs signal, today"></div>
+        <div class="chart-frame" id="chart-frame"><img class="daychart" id="chart-img" src="charts/chart_latest.png?t=${encodeURIComponent(state.generated_at || Date.now())}" alt="NIFTY spot vs signal, today"></div>
       </div>
       <div class="box">
         <h3>Trade log (today)</h3>
