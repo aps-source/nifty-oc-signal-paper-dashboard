@@ -241,17 +241,26 @@ function renderChart(dayEntries) {
   return card;
 }
 
+function gammaRec(e) {
+  if (e.net_gex < 0 && e.spot > e.wall_strike) return "Call Buy";
+  if (e.net_gex < 0 && e.spot < e.wall_strike) return "Put Buy";
+  return "No Signal";
+}
+
 function renderTable(dayEntries) {
   const wrap = document.createElement("div"); wrap.className = "table-wrap";
   const table = document.createElement("table");
-  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th><th>Recommendation</th></tr></thead>";
   const tbody = document.createElement("tbody");
   dayEntries.slice().reverse().forEach((e) => {
     const tr = document.createElement("tr");
     const dist = Math.abs(e.spot - e.wall_strike).toFixed(0);
+    const rec = gammaRec(e);
+    const recColor = rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)";
     tr.innerHTML = `<td style="text-align:left">${e.time}</td><td>${e.spot.toFixed(1)}</td>` +
       `<td style="color:${e.net_gex < 0 ? 'var(--critical)' : 'var(--good)'}">${fmtGex(e.net_gex)}</td>` +
-      `<td>${e.wall_strike.toFixed(0)}</td><td>${dist}</td>`;
+      `<td>${e.wall_strike.toFixed(0)}</td><td>${dist}</td>` +
+      `<td style="color:${recColor};font-weight:700">${rec}</td>`;
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
