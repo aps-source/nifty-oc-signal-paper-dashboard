@@ -81,12 +81,21 @@
   </header>
 
   <div class="banner">
-    <b>Not a signal, not used by the paper trader.</b> One day (2026-10-13) showed a modest tilt
-    (rank-corr |net GEX| vs next-12min move &asymp; 0.25, survived a shuffle-null check) &mdash; nowhere
-    near enough days to trust. This page just logs the raw numbers every tick so that question can
-    actually be answered after a few weeks, instead of guessed from one day.
+    <b>Unvalidated rule, paper-traded on purpose to find out.</b> One day (2026-10-13) showed a
+    modest tilt (rank-corr |net GEX| vs next-12min move &asymp; 0.25) &mdash; pooled across all 12
+    backfilled days it was &rho;=&minus;0.04, essentially nothing. At the user's request this is
+    now paper-traded live anyway (negative GEX + spot above the gamma wall &rarr; Call Buy,
+    below &rarr; Put Buy; separate from, and never touching, the main signal paper trader) to get
+    a real couple of months of evidence instead of a one-day guess.
   </div>
 
+  <div class="stat-row" id="posStats"></div>
+  <div class="chart-card" id="posBox" style="padding:16px 20px;"></div>
+
+  <h2 style="font-size:15px;margin:26px 0 10px;">Gamma trade log</h2>
+  <div class="table-wrap" id="tradesTable" style="margin-bottom:24px;"></div>
+
+  <h2 style="font-size:15px;margin:26px 0 10px;">GEX / spot history</h2>
   <div class="controls">
     <select id="daySelect" aria-label="Select day"></select>
   </div>
@@ -99,6 +108,10 @@
     &minus; &Sigma;PE_OI&times;PE_gamma) &times; spot&sup2; &times; 0.01 &times; lot size (retail
     convention: negative = dealers net short gamma = hedging tends to amplify moves). Gamma wall =
     the strike with the largest OI&times;gamma (CE+PE). Kept for the last 90 days.
+    Paper trade: 1 lot of the ATM strike, flat at day start, reversal closes+reopens, forced
+    close at day end, new entries only 09:16&ndash;15:14 IST, no stop-loss or target &mdash; same
+    mechanics as the main paper trader, just driven by the GEX rule above instead of the
+    price/OI/IV signal. PAPER ONLY, never a real order.
   </footer>
 </div>
 
@@ -291,7 +304,60 @@ async function init() {
   renderDay(dates[0]);
 }
 
-init();
+const rs = (v) => (v >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
+const tm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }) : "—";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+async function initPaperTrade() {
+  let pos = null, trades = [];
+  try {
+    pos = await (await fetch("gamma_position.json?t=" + Date.now(), { cache: "no-store" })).json();
+  } catch (e) { /* no position file yet -- fine before the first live tick */ }
+  try {
+    trades = await (await fetch("gamma_trades.json?t=" + Date.now(), { cache: "no-store" })).json();
+  } catch (e) { trades = []; }
+
+  const statsEl = document.getElementById("posStats");
+  const wins = trades.filter((t) => t.pnl_pts > 0).length;
+  const net = trades.reduce((a, t) => a + (Number(t.pnl_rs) || 0), 0);
+  const tiles = [
+    ["Recommendation right now", pos ? pos.recommendation : "—", pos && pos.recommendation === "Call Buy" ? "good" : pos && pos.recommendation === "Put Buy" ? "critical" : ""],
+    ["Net GEX (last tick)", pos ? fmtGex(pos.net_gex) : "—", pos && pos.net_gex < 0 ? "critical" : "good"],
+    ["Trades logged", trades.length, ""],
+    ["Win rate", trades.length ? Math.round(100 * wins / trades.length) + "%" : "—", ""],
+    ["Net P&L", rs(net), net >= 0 ? "good" : "critical"],
+  ];
+  statsEl.innerHTML = tiles.map(([l, v, c]) =>
+    `<div class="stat"><div class="v" style="color:${c ? "var(--" + c + ")" : ""}">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  const posBox = document.getElementById("posBox");
+  if (pos && pos.position) {
+    const p = pos.position;
+    posBox.innerHTML = `<b>Open: ${p.side} ${p.strike}</b> &mdash; entered ${tm(p.entry_time)} @ ${p.entry_price}, last ${p.last_known_price} ` +
+      `(${(p.last_known_price - p.entry_price >= 0 ? "+" : "")}${(p.last_known_price - p.entry_price).toFixed(2)} pts)`;
+  } else {
+    posBox.innerHTML = `<span style="color:var(--text-muted)">Flat — no open gamma-theory position.</span>`;
+  }
+
+  const tbl = document.getElementById("tradesTable");
+  if (!trades.length) {
+    tbl.innerHTML = `<div class="empty-note">No gamma-theory trades yet — starts from today forward, not backfilled.</div>`;
+    return;
+  }
+  const rows = trades.map((t) => `<tr>
+      <td style="text-align:left">${t.date}</td>
+      <td style="text-align:left">${t.side}</td>
+      <td>${t.strike}</td>
+      <td>${tm(t.entry_time)}</td><td>${t.entry_price.toFixed(2)}</td>
+      <td>${tm(t.exit_time)}</td><td>${t.exit_price.toFixed(2)}</td>
+      <td style="text-align:left">${esc(t.reason)}</td>
+      <td style="color:${t.pnl_pts >= 0 ? "var(--good)" : "var(--critical)"}">${t.pnl_pts >= 0 ? "+" : ""}${t.pnl_pts.toFixed(2)}</td>
+      <td style="color:${t.pnl_rs >= 0 ? "var(--good)" : "var(--critical)"}">${rs(t.pnl_rs)}</td>
+    </tr>`).join("");
+  tbl.innerHTML = `<table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Side</th><th>Strike</th><th>Entry</th><th>Buy px</th><th>Exit</th><th>Sell px</th><th style="text-align:left">Reason</th><th>Diff pts</th><th>P&amp;L</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+initPaperTrade();
 </script>
 </body>
 </html>
