@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NIFTY Option-Chain Signal — Gamma Research</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f2f5fa;
+    --surface-1:      #ffffff;
+    --surface-2:      #e9edf5;
+    --text-primary:   #11151f;
+    --text-secondary: #5a6478;
+    --text-muted:     #838da2;
+    --gridline:       #dbe1ec;
+    --border:         rgba(17,21,31,0.12);
+    --accent:         #4a3aa7;
+    --good:           #0ca30c;
+    --critical:       #d03b3b;
+    --warning:        #b5710a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page:           #0a0d14;
+      --surface-1:      #141a26;
+      --surface-2:      #1c2434;
+      --text-primary:   #eef1f8;
+      --text-secondary: #9aa4bd;
+      --text-muted:     #7c869e;
+      --gridline:       #262f42;
+      --border:         rgba(238,241,248,0.12);
+      --accent:         #9085e9;
+      --good:           #28c840;
+      --critical:       #f0645f;
+      --warning:        #f2b636;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text-primary); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 20px 24px 40px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-bottom: 14px; }
+  h1 { font-size: 21px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); font-size: 15px; margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; padding-top: 3px; }
+  .back-link:hover { text-decoration: underline; }
+  .banner { border: 1px solid var(--warning); background: color-mix(in srgb, var(--warning) 14%, var(--surface-1)); border-radius: 12px; padding: 14px 18px; font-size: 13.5px; line-height: 1.6; margin-bottom: 18px; }
+  .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 4px 0 18px; }
+  select { font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat .l { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .chart-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 8px; margin-bottom: 18px; }
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .zeroline { stroke: var(--text-muted); stroke-width: 1; }
+  .axis-label { font-size: 10.5px; fill: var(--text-muted); }
+  .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 480px; }
+  thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  .empty-note { border: 1px dashed var(--border); border-radius: 12px; padding: 16px 18px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+  footer { padding: 18px 0 8px; font-size: 13px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Gamma Research</h1>
+      <div class="sub">Net Gamma Exposure (GEX) &amp; gamma wall, logged every 4 min &mdash; a separate, read-only research log</div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Back to paper trade</a>
+  </header>
+
+  <div class="banner">
+    <b>Not a signal, not used by the paper trader.</b> One day (2026-10-13) showed a modest tilt
+    (rank-corr |net GEX| vs next-12min move &asymp; 0.25, survived a shuffle-null check) &mdash; nowhere
+    near enough days to trust. This page just logs the raw numbers every tick so that question can
+    actually be answered after a few weeks, instead of guessed from one day.
+  </div>
+
+  <div class="controls">
+    <select id="daySelect" aria-label="Select day"></select>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>
+    Reads gamma_log.json from this folder &mdash; one entry per tick, logged by a separate task from
+    the paper trader (gamma_tick.py), pushed to this same site. Net GEX = (&Sigma;CE_OI&times;CE_gamma
+    &minus; &Sigma;PE_OI&times;PE_gamma) &times; spot&sup2; &times; 0.01 &times; lot size (retail
+    convention: negative = dealers net short gamma = hedging tends to amplify moves). Gamma wall =
+    the strike with the largest OI&times;gamma (CE+PE). Kept for the last 90 days.
+  </footer>
+</div>
+
+<script>
+const LOG_URL = "gamma_log.json";
+let ALL = [];
+
+function fmtGex(v) {
+  const a = Math.abs(v);
+  const s = a >= 1e12 ? (a/1e12).toFixed(2)+"T" : a >= 1e9 ? (a/1e9).toFixed(2)+"B" : a.toFixed(0);
+  return (v < 0 ? "−" : "+") + s;
+}
+
+function spearman(xs, ys) {
+  const n = xs.length;
+  if (n < 5) return null;
+  const rank = (arr) => {
+    const idx = arr.map((v, i) => i).sort((a, b) => arr[a] - arr[b]);
+    const r = new Array(n);
+    idx.forEach((orig, pos) => { r[orig] = pos + 1; });
+    return r;
+  };
+  const rx = rank(xs), ry = rank(ys);
+  const mx = rx.reduce((a, b) => a + b, 0) / n, my = ry.reduce((a, b) => a + b, 0) / n;
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = rx[i] - mx, dy = ry[i] - my;
+    num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+  }
+  const denom = Math.sqrt(dx2 * dy2);
+  return denom ? num / denom : null;
+}
+
+function renderStats(dayEntries) {
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  const last = dayEntries[dayEntries.length - 1];
+  const negPct = Math.round(100 * dayEntries.filter((e) => e.net_gex < 0).length / dayEntries.length);
+
+  // pooled correlation across ALL logged days (not just this one) -- observational, shown with N
+  const pairs = [];
+  const byDay = {};
+  ALL.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e); });
+  Object.values(byDay).forEach((arr) => {
+    arr.sort((a, b) => a.time.localeCompare(b.time));
+    for (let i = 0; i < arr.length - 3; i++) {
+      pairs.push([Math.abs(arr[i].net_gex), Math.abs(arr[i + 3].spot - arr[i].spot)]);
+    }
+  });
+  const rho = spearman(pairs.map((p) => p[0]), pairs.map((p) => p[1]));
+
+  const stats = [
+    ["Ticks today", dayEntries.length, ""],
+    ["Negative-GEX ticks", negPct + "%", ""],
+    ["Net GEX (last tick)", fmtGex(last.net_gex), last.net_gex < 0 ? "critical" : "good"],
+    ["Days logged (all-time)", Object.keys(byDay).length, ""],
+    ["|GEX| vs next-12min move", rho == null ? "not enough days yet" : "ρ = " + rho.toFixed(2) + " (n=" + pairs.length + ")", ""],
+  ];
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v"; v.style.color = cls ? `var(--${cls})` : "";
+    v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+function renderChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 420, padL = 56, padR = 14, padT = 14, padMid = 20, padB = 30;
+  const topH = 220, botH = H - topH - padT - padMid - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  const n = dayEntries.length;
+  const plotW = W - padL - padR;
+  const x = (i) => padL + plotW * (i / (n - 1 || 1));
+
+  // top: spot line
+  const spots = dayEntries.map((e) => e.spot);
+  const sMin = Math.min(...spots), sMax = Math.max(...spots), sSpan = (sMax - sMin) || 1;
+  const yTop = (v) => padT + topH - topH * ((v - sMin) / sSpan);
+  [0, 0.5, 1].forEach((f) => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + topH * (1 - f), y2: padT + topH * (1 - f), class: "gridline" })));
+  [sMin, (sMin + sMax) / 2, sMax].forEach((v, i) => {
+    const lab = el("text", { x: padL - 8, y: padT + topH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  });
+  const linePts = dayEntries.map((e, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${yTop(e.spot).toFixed(1)}`).join(" ");
+  svg.appendChild(el("path", { d: linePts, fill: "none", stroke: "var(--accent)", "stroke-width": "2" }));
+
+  // bottom: net_gex bars
+  const gexTop = padT + topH + padMid;
+  const gexs = dayEntries.map((e) => e.net_gex);
+  const gMax = Math.max(1, ...gexs.map(Math.abs));
+  const zeroY = gexTop + botH / 2;
+  const scale = (botH / 2 - 4) / gMax;
+  svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: zeroY, y2: zeroY, class: "zeroline" }));
+  const barW = Math.max(1.5, (plotW / n) * 0.6);
+  dayEntries.forEach((e, i) => {
+    const h = Math.abs(e.net_gex) * scale;
+    const bar = el("rect", {
+      x: x(i) - barW / 2, y: e.net_gex >= 0 ? zeroY - h : zeroY, width: barW, height: Math.max(h, 0.5),
+      fill: e.net_gex >= 0 ? "var(--good)" : "var(--critical)",
+    });
+    svg.appendChild(bar);
+  });
+  const gexLabel = el("text", { x: padL - 8, y: gexTop + 10, class: "axis-label", "text-anchor": "end" });
+  gexLabel.textContent = "GEX+"; svg.appendChild(gexLabel);
+  const gexLabel2 = el("text", { x: padL - 8, y: gexTop + botH - 4, class: "axis-label", "text-anchor": "end" });
+  gexLabel2.textContent = "GEX−"; svg.appendChild(gexLabel2);
+
+  const step = Math.max(1, Math.floor(n / 16));
+  dayEntries.forEach((e, i) => {
+    if (i % step === 0 || n <= 16) {
+      const lab = el("text", { x: x(i), y: H - 6, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time; svg.appendChild(lab);
+    }
+  });
+
+  card.appendChild(svg);
+  return card;
+}
+
+function renderTable(dayEntries) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntries.slice().reverse().forEach((e) => {
+    const tr = document.createElement("tr");
+    const dist = Math.abs(e.spot - e.wall_strike).toFixed(0);
+    tr.innerHTML = `<td style="text-align:left">${e.time}</td><td>${e.spot.toFixed(1)}</td>` +
+      `<td style="color:${e.net_gex < 0 ? 'var(--critical)' : 'var(--good)'}">${fmtGex(e.net_gex)}</td>` +
+      `<td>${e.wall_strike.toFixed(0)}</td><td>${dist}</td>`;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+  const dayEntries = ALL.filter((e) => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+  if (!dayEntries.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderChart(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load gamma_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+  if (!ALL.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No gamma data logged yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+  const dates = Array.from(new Set(ALL.map((e) => e.date))).sort().reverse();
+  const select = document.getElementById("daySelect");
+  dates.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+</script>
+</body>
+</html>
