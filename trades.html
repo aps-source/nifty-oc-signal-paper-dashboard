@@ -32,20 +32,29 @@
     background-attachment: fixed;
   }
   .hero { background: linear-gradient(115deg, var(--brand-a) 0%, var(--brand-b) 52%, var(--brand-c) 100%); color: #fff; padding: 1.05rem clamp(14px, 2vw, 32px); box-shadow: 0 6px 26px rgba(67,56,202,0.28); }
-  .hero-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .hero-inner { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   h1 { font-size: 1.3rem; margin: 0; font-weight: 800; }
   a.btn { background: #fff; color: var(--brand-a); text-decoration: none; font-weight: 700; font-size: 0.88rem; padding: 0.45rem 0.95rem; border-radius: 999px; box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
-  .page { max-width: 1200px; margin: 0 auto; padding: 1.2rem clamp(14px, 2vw, 32px) 2rem; }
+  .page { max-width: 1300px; margin: 0 auto; padding: 1.2rem clamp(14px, 2vw, 32px) 2rem; }
   .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 1rem; padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
-  .summary { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary); }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem 1.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .summary { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.9rem; color: var(--text-secondary); }
   .summary b { color: var(--text-primary); font-size: 1.1rem; }
+  .filters { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .filters select {
+    font: inherit; font-size: 0.85rem; font-weight: 600; color: var(--text-primary);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 0.6rem;
+    padding: 0.4rem 0.7rem; cursor: pointer;
+  }
   table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
-  th { text-align: left; color: var(--text-muted); font-weight: 700; padding: 0.4rem; border-bottom: 2px solid var(--gridline); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
-  td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
+  th { text-align: left; color: var(--text-muted); font-weight: 700; padding: 0.4rem; border-bottom: 2px solid var(--gridline); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .side-pill { font-weight: 800; font-size: 0.72rem; padding: 0.12rem 0.55rem; border-radius: 999px; color: #fff; }
   .side-pill.CE { background: var(--call); } .side-pill.PE { background: var(--put); }
+  .reason-pill { font-size: 0.76rem; font-weight: 600; padding: 0.12rem 0.6rem; border-radius: 999px; background: var(--surface-2); color: var(--text-secondary); }
   .pos-pnl-cell { color: var(--good); font-weight: 700; } .neg-pnl-cell { color: var(--critical); font-weight: 700; }
-  .empty-row td { color: var(--text-muted); text-align: center; padding: 1.1rem; }
+  .empty-row td { color: var(--text-muted); text-align: center; padding: 1.1rem; white-space: normal; }
+  .table-wrap { overflow-x: auto; }
   footer { margin-top: 1.2rem; font-size: 0.78rem; color: var(--text-muted); text-align: center; }
 </style>
 </head>
@@ -59,39 +68,103 @@
 </header>
 <main class="page">
   <div class="card">
-    <div class="summary" id="summary">Loading…</div>
-    <table>
-      <thead><tr><th>Date</th><th>Expiry</th><th>Side</th><th>Strike</th><th>Entry time</th><th>Buy px</th><th>Exit time</th><th>Sell px</th><th>Reason</th><th>Diff pts</th><th>Gain/Loss Rs</th></tr></thead>
-      <tbody id="rows"><tr class="empty-row"><td colspan="11">Loading…</td></tr></tbody>
-    </table>
+    <div class="toolbar">
+      <div class="summary" id="summary">Loading…</div>
+      <div class="filters">
+        <select id="filterMonth"><option value="">All months</option></select>
+        <select id="filterDate"><option value="">All dates</option></select>
+        <select id="filterSide">
+          <option value="">Call &amp; Put</option>
+          <option value="CE">Call (CE) only</option>
+          <option value="PE">Put (PE) only</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Expiry</th><th>Side</th><th>Strike</th><th>Entry</th><th>Buy px</th><th>Exit</th><th>Sell px</th><th>Reason</th><th>Diff pts</th><th>Gain/Loss Rs</th></tr></thead>
+        <tbody id="rows"><tr class="empty-row"><td colspan="11">Loading…</td></tr></tbody>
+      </table>
+    </div>
   </div>
-  <footer>Paper trades only. Full history, newest first.</footer>
+  <footer>Paper trades only. Only NIFTY is traded by this project, so there's no instrument filter -- Call/Put, date and month cover it.</footer>
 </main>
 <script>
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const rs = (v) => (v >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
-const tm = (iso) => iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—";
+const tm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }) : "—";
+const dm = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit", timeZone: "Asia/Kolkata" }) : "—";
+
+let ALL_TRADES = [];
+
+function monthKey(dateStr) { return dateStr.slice(0, 7); } // "2026-10-13" -> "2026-10"
+
+function populateFilters() {
+  const months = [...new Set(ALL_TRADES.map((t) => monthKey(t.date)))].sort().reverse();
+  const monthSel = document.getElementById("filterMonth");
+  months.forEach((m) => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = new Date(m + "-01").toLocaleDateString("en-IN", { year: "numeric", month: "long" });
+    monthSel.appendChild(opt);
+  });
+}
+
+function refreshDateOptions() {
+  const month = document.getElementById("filterMonth").value;
+  const dateSel = document.getElementById("filterDate");
+  const keep = dateSel.value;
+  dateSel.innerHTML = '<option value="">All dates</option>';
+  const dates = [...new Set(ALL_TRADES.filter((t) => !month || monthKey(t.date) === month).map((t) => t.date))].sort().reverse();
+  dates.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = dm(d + "T00:00:00+05:30");
+    dateSel.appendChild(opt);
+  });
+  if (dates.includes(keep)) dateSel.value = keep; else dateSel.value = "";
+}
+
+function applyFilters() {
+  const month = document.getElementById("filterMonth").value;
+  const date = document.getElementById("filterDate").value;
+  const side = document.getElementById("filterSide").value;
+  const filtered = ALL_TRADES.filter((t) =>
+    (!month || monthKey(t.date) === month) &&
+    (!date || t.date === date) &&
+    (!side || t.side === side));
+  render(filtered);
+}
+
+function render(trades) {
+  const wins = trades.filter((t) => t.pnl_pts > 0).length;
+  const net = trades.reduce((a, t) => a + (Number(t.pnl_rs) || 0), 0);
+  document.getElementById("summary").innerHTML =
+    `<span><b>${trades.length}</b> trades</span><span><b>${trades.length ? Math.round(100 * wins / trades.length) : 0}%</b> win</span><span><b style="color:${net >= 0 ? 'var(--good)' : 'var(--critical)'}">${rs(net)}</b> net</span>`;
+  document.getElementById("rows").innerHTML = trades.length
+    ? trades.map((t) => `
+      <tr>
+        <td>${t.date}</td><td>${t.expiry}</td>
+        <td><span class="side-pill ${t.side}">${t.side}</span></td>
+        <td>${t.strike}</td>
+        <td>${tm(t.entry_time)}</td><td>${t.entry_price.toFixed(2)}</td>
+        <td>${tm(t.exit_time)}</td><td>${t.exit_price.toFixed(2)}</td>
+        <td><span class="reason-pill">${esc(t.reason)}</span></td>
+        <td class="${t.pnl_pts >= 0 ? 'pos-pnl-cell' : 'neg-pnl-cell'}">${t.pnl_pts >= 0 ? "+" : ""}${t.pnl_pts.toFixed(2)}</td>
+        <td class="${t.pnl_rs >= 0 ? 'pos-pnl-cell' : 'neg-pnl-cell'}">${rs(t.pnl_rs)}</td>
+      </tr>`).join("")
+    : '<tr class="empty-row"><td colspan="11">No trades match these filters.</td></tr>';
+}
 
 fetch("trade_log.json?t=" + Date.now(), { cache: "no-store" })
   .then((r) => r.json())
   .then((trades) => {
-    const wins = trades.filter((t) => t.pnl_pts > 0).length;
-    const net = trades.reduce((a, t) => a + (Number(t.pnl_rs) || 0), 0);
-    document.getElementById("summary").innerHTML =
-      `<span><b>${trades.length}</b> trades</span><span><b>${trades.length ? Math.round(100 * wins / trades.length) : 0}%</b> win</span><span><b style="color:${net >= 0 ? 'var(--good)' : 'var(--critical)'}">${rs(net)}</b> net</span>`;
-    document.getElementById("rows").innerHTML = trades.length
-      ? trades.map((t) => `
-        <tr>
-          <td>${t.date}</td><td>${t.expiry}</td>
-          <td><span class="side-pill ${t.side}">${t.side}</span></td>
-          <td>${t.strike}</td>
-          <td>${tm(t.entry_time)}</td><td>${t.entry_price.toFixed(2)}</td>
-          <td>${tm(t.exit_time)}</td><td>${t.exit_price.toFixed(2)}</td>
-          <td>${esc(t.reason)}</td>
-          <td class="${t.pnl_pts >= 0 ? 'pos-pnl-cell' : 'neg-pnl-cell'}">${t.pnl_pts >= 0 ? "+" : ""}${t.pnl_pts.toFixed(2)}</td>
-          <td>${rs(t.pnl_rs)}</td>
-        </tr>`).join("")
-      : '<tr class="empty-row"><td colspan="11">No trades yet.</td></tr>';
+    ALL_TRADES = trades;
+    populateFilters();
+    refreshDateOptions();
+    render(ALL_TRADES);
+    document.getElementById("filterMonth").addEventListener("change", () => { refreshDateOptions(); applyFilters(); });
+    document.getElementById("filterDate").addEventListener("change", applyFilters);
+    document.getElementById("filterSide").addEventListener("change", applyFilters);
   })
   .catch((e) => {
     document.getElementById("rows").innerHTML = `<tr class="empty-row"><td colspan="11">Failed to load trade_log.json — ${esc(e.message)}</td></tr>`;
