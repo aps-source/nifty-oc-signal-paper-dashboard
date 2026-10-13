@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-10-13T15:39:02+05:30",
-  "generated_at": "2026-10-13T15:43:06.854833",
+  "as_of": "2026-10-13T15:43:02+05:30",
+  "generated_at": "2026-10-13T15:47:08.488232",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -10,44 +10,36 @@
   "strongest_strike": null,
   "strongest_score": null,
   "confidence": null,
-  "data_quality": "Partial history",
+  "data_quality": "Complete",
   "checklist": {
     "strike": 22700.0,
     "ce": {
-      "5m": -2.0,
+      "5m": 0.0,
       "15m": -3.0,
       "60m": 1.0,
-      "composite": -5.0
+      "composite": -3.0
     },
     "pe": {
       "5m": 0.0,
-      "15m": -3.0,
+      "15m": -2.0,
       "60m": -2.0,
-      "composite": -12.0
+      "composite": -10.0
     }
   },
   "oi_metrics": {
     "spot": 22721.95,
     "resistance_strike": 22750.0,
-    "resistance_oi": 20577505.0,
+    "resistance_oi": 20490730.0,
     "support_strike": 22700.0,
-    "support_oi": 24331905.0,
+    "support_oi": 24262875.0,
     "max_pain": 22700.0,
-    "pcr": 1.014,
+    "pcr": 1.013,
     "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 36799165.0
+    "atm_straddle_oi": 36529090.0
   },
-  "position": {
-    "side": "CE",
-    "strike": 22550.0,
-    "entry_time": "2026-10-13T13:43:02+05:30",
-    "entry_price": 34.7,
-    "last_known_price": 171.95,
-    "qty": 65,
-    "expiry": "2026-10-13"
-  },
-  "trades_today": 4,
-  "realized_pnl_today": -1062.75,
+  "position": null,
+  "trades_today": 5,
+  "realized_pnl_today": 7852.0,
   "today_trades": [
     {
       "date": "2026-10-13",
@@ -100,11 +92,24 @@
       "reason": "reversal",
       "pnl_pts": -11.65,
       "pnl_rs": -757.25
+    },
+    {
+      "date": "2026-10-13",
+      "entry_time": "2026-10-13T13:43:02+05:30",
+      "exit_time": "2026-10-13T15:43:02+05:30",
+      "side": "CE",
+      "strike": 22550.0,
+      "expiry": "2026-10-13",
+      "entry_price": 34.7,
+      "exit_price": 171.85,
+      "reason": "EOD",
+      "pnl_pts": 137.15,
+      "pnl_rs": 8914.75
     }
   ],
   "all_time": {
-    "trades": 11,
-    "win_pct": 27.27272727272727,
-    "net_points": -20.249999999999996
+    "trades": 12,
+    "win_pct": 33.33333333333333,
+    "net_points": 116.9
   }
 }
