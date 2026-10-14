@@ -3837,5 +3837,16 @@
     "score": 16.0,
     "confidence": "Strong",
     "spot": 22575.55
+  },
+  {
+    "date": "2026-10-14",
+    "time": "13:27",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 9.0,
+    "strike": 23100.0,
+    "score": 9.0,
+    "confidence": "Moderate",
+    "spot": 22584.95
   }
 ]
