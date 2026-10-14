@@ -3419,5 +3419,16 @@
     "score": 9.0,
     "confidence": "Moderate",
     "spot": 22741.25
+  },
+  {
+    "date": "2026-10-14",
+    "time": "10:55",
+    "status": "Mixed",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22726.65
   }
 ]
