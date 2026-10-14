@@ -4178,5 +4178,16 @@
     "score": null,
     "confidence": null,
     "spot": 22625.15
+  },
+  {
+    "date": "2026-10-14",
+    "time": "15:31",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22622.7
   }
 ]
