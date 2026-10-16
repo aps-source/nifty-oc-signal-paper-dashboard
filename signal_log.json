@@ -5432,5 +5432,16 @@
     "score": 11.0,
     "confidence": "Moderate",
     "spot": 23119.0
+  },
+  {
+    "date": "2026-10-16",
+    "time": "15:19",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23119.0
   }
 ]
