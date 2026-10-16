@@ -1,5 +1,18 @@
 [
   {
+    "date": "2026-10-16",
+    "expiry": "2026-10-19",
+    "side": "CE",
+    "strike": 22850.0,
+    "entry_time": "2026-10-15T10:03:03+05:30",
+    "exit_time": "2026-10-16T09:27:04+05:30",
+    "entry_price": 139.6,
+    "exit_price": 162.9,
+    "reason": "reversal",
+    "pnl_pts": 23.3,
+    "pnl_rs": 1514.5
+  },
+  {
     "date": "2026-10-14",
     "expiry": "2026-10-19",
     "side": "PE",
