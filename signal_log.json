@@ -5377,5 +5377,16 @@
     "score": null,
     "confidence": null,
     "spot": 23103.9
+  },
+  {
+    "date": "2026-10-16",
+    "time": "14:59",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 11.0,
+    "strike": 23050.0,
+    "score": 11.0,
+    "confidence": "Moderate",
+    "spot": 23083.5
   }
 ]
