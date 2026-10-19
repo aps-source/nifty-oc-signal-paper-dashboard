@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-10-19 15:27:02",
-  "spot": 22873.55,
-  "net_gex": 47428845868727.305,
+  "as_of": "2026-10-19 15:31:08",
+  "spot": 22888.95,
+  "net_gex": -34237979760745.387,
   "wall_strike": 22900.0,
-  "recommendation": "No Signal",
+  "recommendation": "Put Buy",
   "position": null
 }
