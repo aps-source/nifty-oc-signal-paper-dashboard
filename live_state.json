@@ -1,41 +1,41 @@
 {
-  "as_of": "2026-10-19T09:23:05+05:30",
-  "generated_at": "2026-10-19T09:27:04.733453",
+  "as_of": "2026-10-19T09:27:02+05:30",
+  "generated_at": "2026-10-19T09:31:13.096469",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 23140.75,
-  "atm": 23150.0,
+  "spot": 23016.05,
+  "atm": 23000.0,
   "overall": "No Signal",
   "strongest_strike": null,
   "strongest_score": null,
   "confidence": null,
   "data_quality": "Partial history",
   "checklist": {
-    "strike": 23150.0,
+    "strike": 23000.0,
     "ce": {
-      "5m": -2.0,
-      "15m": -2.0,
+      "5m": -1.0,
+      "15m": -1.0,
       "60m": null,
-      "composite": -6.0
+      "composite": -3.0
     },
     "pe": {
-      "5m": 2.0,
-      "15m": -2.0,
+      "5m": 3.0,
+      "15m": 2.0,
       "60m": null,
-      "composite": -2.0
+      "composite": 7.0
     }
   },
   "oi_metrics": {
-    "spot": 23140.75,
+    "spot": 23016.05,
     "resistance_strike": 23200.0,
-    "resistance_oi": 20290595.0,
+    "resistance_oi": 20932340.0,
     "support_strike": 23000.0,
-    "support_oi": 17321200.0,
+    "support_oi": 17709120.0,
     "max_pain": 23100.0,
-    "pcr": 0.815,
-    "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 24888760.0
+    "pcr": 1.091,
+    "pcr_suggestion": "NEUTRAL",
+    "atm_straddle_oi": 24731265.0
   },
   "position": null,
   "trades_today": 0,
