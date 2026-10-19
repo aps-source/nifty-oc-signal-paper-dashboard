@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-10-19T09:47:08+05:30",
-  "generated_at": "2026-10-19T09:51:22.015565",
+  "as_of": "2026-10-19T09:51:10+05:30",
+  "generated_at": "2026-10-19T09:55:10.359026",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 23126.55,
+  "spot": 23132.3,
   "atm": 23150.0,
   "overall": "No Signal",
   "strongest_strike": null,
@@ -14,28 +14,28 @@
   "checklist": {
     "strike": 23150.0,
     "ce": {
-      "5m": 2.0,
+      "5m": 0.0,
       "15m": 2.0,
       "60m": null,
-      "composite": 6.0
+      "composite": 4.0
     },
     "pe": {
-      "5m": -1.0,
+      "5m": -2.0,
       "15m": -2.0,
       "60m": null,
-      "composite": -5.0
+      "composite": -6.0
     }
   },
   "oi_metrics": {
-    "spot": 23126.55,
+    "spot": 23132.3,
     "resistance_strike": 23200.0,
-    "resistance_oi": 21866325.0,
+    "resistance_oi": 22655555.0,
     "support_strike": 23000.0,
-    "support_oi": 21612370.0,
+    "support_oi": 22848930.0,
     "max_pain": 23100.0,
-    "pcr": 0.887,
-    "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 28502240.0
+    "pcr": 0.904,
+    "pcr_suggestion": "NEUTRAL",
+    "atm_straddle_oi": 30269655.0
   },
   "position": {
     "side": "CE",
