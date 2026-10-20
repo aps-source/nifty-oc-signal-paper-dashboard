@@ -1,8 +1,8 @@
 {
   "as_of": "2026-10-19T15:35:02+05:30",
-  "generated_at": "2026-10-19T15:47:06.402880",
-  "is_preview": false,
-  "preview_date": null,
+  "generated_at": "2026-10-20T18:39:12.652088",
+  "is_preview": true,
+  "preview_date": "2026-10-19",
   "start_date": "2026-10-12",
   "spot": 22888.95,
   "atm": 22900.0,
