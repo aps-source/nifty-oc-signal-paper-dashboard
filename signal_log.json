@@ -8204,5 +8204,27 @@
     "score": null,
     "confidence": null,
     "spot": 22703.75
+  },
+  {
+    "date": "2026-10-21",
+    "time": "14:07",
+    "status": "Call Buy",
+    "call": 8.0,
+    "put": 0,
+    "strike": 22200.0,
+    "score": 8.0,
+    "confidence": "Moderate",
+    "spot": 22704.35
+  },
+  {
+    "date": "2026-10-21",
+    "time": "14:07",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22702.25
   }
 ]
