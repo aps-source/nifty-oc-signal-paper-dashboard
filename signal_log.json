@@ -6763,5 +6763,38 @@
     "score": null,
     "confidence": null,
     "spot": 23114.35
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:43",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23112.1
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:43",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23099.5
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:47",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23075.5
   }
 ]
