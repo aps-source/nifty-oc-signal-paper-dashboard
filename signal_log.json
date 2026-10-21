@@ -7654,5 +7654,27 @@
     "score": 17.0,
     "confidence": "Strong",
     "spot": 22712.2
+  },
+  {
+    "date": "2026-10-21",
+    "time": "12:27",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 18.0,
+    "strike": 22500.0,
+    "score": 18.0,
+    "confidence": "Strong",
+    "spot": 22719.4
+  },
+  {
+    "date": "2026-10-21",
+    "time": "12:27",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 14.0,
+    "strike": 22500.0,
+    "score": 14.0,
+    "confidence": "Strong",
+    "spot": 22726.5
   }
 ]
