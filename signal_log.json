@@ -6576,5 +6576,60 @@
     "score": null,
     "confidence": null,
     "spot": 22888.95
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:03",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23039.25
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:07",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23004.55
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:11",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23016.0
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:15",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 22986.75
+  },
+  {
+    "date": "2026-10-21",
+    "time": "09:15",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "spot": 23016.95
   }
 ]
