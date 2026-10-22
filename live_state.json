@@ -1,53 +1,53 @@
 {
-  "as_of": "2026-10-22T13:31:17+05:30",
-  "generated_at": "2026-10-22T13:39:14.872890",
+  "as_of": "2026-10-22T13:39:06+05:30",
+  "generated_at": "2026-10-22T13:43:14.143250",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 22638.8,
-  "atm": 22650.0,
-  "overall": "Call Buy",
-  "strongest_strike": 22500.0,
-  "strongest_score": 10.0,
-  "confidence": "Moderate",
+  "spot": 22614.75,
+  "atm": 22600.0,
+  "overall": "Put Buy",
+  "strongest_strike": 22650.0,
+  "strongest_score": 14.0,
+  "confidence": "Strong",
   "data_quality": "Complete",
   "checklist": {
-    "strike": 22500.0,
+    "strike": 22650.0,
     "ce": {
-      "5m": 3.0,
+      "5m": 0.0,
       "15m": -1.0,
-      "60m": 3.0,
-      "composite": 10.0
+      "60m": -2.0,
+      "composite": -8.0
     },
     "pe": {
-      "5m": -2.0,
-      "15m": 2.0,
-      "60m": -2.0,
-      "composite": -4.0
+      "5m": 2.0,
+      "15m": 3.0,
+      "60m": 2.0,
+      "composite": 14.0
     }
   },
   "oi_metrics": {
-    "spot": 22638.8,
+    "spot": 22614.75,
     "resistance_strike": 23000.0,
-    "resistance_oi": 16968055.0,
+    "resistance_oi": 17130880.0,
     "support_strike": 22600.0,
-    "support_oi": 10674625.0,
+    "support_oi": 10864945.0,
     "max_pain": 22700.0,
-    "pcr": 1.003,
+    "pcr": 1.095,
     "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 6665750.0
+    "atm_straddle_oi": 16085290.0
   },
   "position": {
-    "side": "CE",
-    "strike": 22650.0,
-    "entry_time": "2026-10-22T13:31:17+05:30",
-    "entry_price": 167.45,
-    "last_known_price": 167.45,
+    "side": "PE",
+    "strike": 22600.0,
+    "entry_time": "2026-10-22T13:39:06+05:30",
+    "entry_price": 132.75,
+    "last_known_price": 132.75,
     "qty": 65,
     "expiry": "2026-10-27"
   },
-  "trades_today": 6,
-  "realized_pnl_today": 1326.0,
+  "trades_today": 7,
+  "realized_pnl_today": 581.75,
   "today_trades": [
     {
       "date": "2026-10-22",
@@ -126,11 +126,24 @@
       "reason": "reversal",
       "pnl_pts": -18.85,
       "pnl_rs": -1225.25
+    },
+    {
+      "date": "2026-10-22",
+      "entry_time": "2026-10-22T13:31:17+05:30",
+      "exit_time": "2026-10-22T13:39:06+05:30",
+      "side": "CE",
+      "strike": 22650.0,
+      "expiry": "2026-10-27",
+      "entry_price": 167.45,
+      "exit_price": 156.0,
+      "reason": "reversal",
+      "pnl_pts": -11.45,
+      "pnl_rs": -744.25
     }
   ],
   "all_time": {
-    "trades": 69,
-    "win_pct": 33.33333333333333,
-    "net_points": -91.04999999999998
+    "trades": 70,
+    "win_pct": 32.857142857142854,
+    "net_points": -102.49999999999999
   }
 }
