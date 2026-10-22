@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-10-22 15:19:02",
+  "as_of": "2026-10-22 15:23:02",
   "spot": 22666.55,
-  "net_gex": -1252719681456.658,
-  "wall_strike": 22700.0,
+  "net_gex": -1048223434225.7782,
+  "wall_strike": 23000.0,
   "recommendation": "Put Buy",
   "position": {
     "side": "PE",
@@ -10,7 +10,7 @@
     "entry_time": "2026-10-22 13:15:04",
     "date": "2026-10-22",
     "entry_price": 125.35,
-    "last_known_price": 116.9,
+    "last_known_price": 119.2,
     "qty": 65,
     "expiry": "2026-10-27",
     "net_gex_at_entry": -2071439128074.7,
