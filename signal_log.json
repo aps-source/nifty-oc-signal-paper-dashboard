@@ -8985,5 +8985,16 @@
     "score": 15.0,
     "confidence": "Strong",
     "spot": 22735.8
+  },
+  {
+    "date": "2026-10-22",
+    "time": "11:03",
+    "status": "Call Buy",
+    "call": 14.0,
+    "put": 0,
+    "strike": 22300.0,
+    "score": 14.0,
+    "confidence": "Strong",
+    "spot": 22739.3
   }
 ]
