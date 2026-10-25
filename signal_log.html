@@ -90,7 +90,7 @@
   .tooltip .tt-val { font-weight: 700; margin-left: auto; text-align: right; word-break: break-word; }
 
   .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 480px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 760px; }
   thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
   thead th:first-child, tbody td:first-child { text-align: left; }
   tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -111,7 +111,7 @@
   <header>
     <div>
       <h1>Signal History</h1>
-      <div class="sub">Overall Status per 4-min tick, 09:00&ndash;15:45 IST (includes preview days before live trading started)</div>
+      <div class="sub">Overall Status per 4-min tick, plus what 5m/15m/30m/60m would each say on their own, 09:00&ndash;15:45 IST (includes preview days before live trading started)</div>
     </div>
     <a class="back-link" href="index.html">&larr; Back to today</a>
   </header>
@@ -129,7 +129,10 @@
   <footer>
     Reads signal_log.json from this folder &mdash; one entry per processed tick, appended automatically (de-duplicated
     by date+time, so re-showing a preview day doesn't double-log it). Bar height is the signal's composite score
-    (needs &ge;8 to count as a signal; &ge;12 is Strong). Kept for the last 90 days.
+    (needs &ge;8 to count as a signal; &ge;12 is Strong). The "alone" columns are a different,
+    simpler read: full price+OI+IV agreement (score &plusmn;3) on that ONE timeframe by itself, at
+    any strike &mdash; not part of the composite model and not traded, just a comparison. Kept for
+    the last 90 days.
   </footer>
 </div>
 
@@ -253,21 +256,30 @@ function renderChart(dayEntries) {
   return card;
 }
 
+function statusCls(s) { return s === "Call Buy" ? "status-call" : s === "Put Buy" ? "status-put" : "status-none"; }
+
 function renderTable(dayEntries) {
   const wrap = document.createElement("div"); wrap.className = "table-wrap";
   const table = document.createElement("table");
-  table.innerHTML = "<thead><tr><th>Time</th><th>Status</th><th>Strike</th><th>Score</th><th>Confidence</th><th>Spot</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Time</th><th>Status (composite)</th><th>Strike</th><th>Score</th><th>Confidence</th><th>Spot</th>" +
+    "<th>5m alone</th><th>15m alone</th><th>30m alone</th><th>60m alone</th></tr></thead>";
   const tbody = document.createElement("tbody");
   dayEntries.slice().reverse().forEach(e => {
     const tr = document.createElement("tr");
-    const statusCls = e.status === "Call Buy" ? "status-call" : e.status === "Put Buy" ? "status-put" : "status-none";
     const timeTd = document.createElement("td"); timeTd.textContent = e.time;
-    const statusTd = document.createElement("td"); statusTd.className = statusCls; statusTd.textContent = e.status;
+    const statusTd = document.createElement("td"); statusTd.className = statusCls(e.status); statusTd.textContent = e.status;
     const strikeTd = document.createElement("td"); strikeTd.textContent = e.strike ?? "—";
     const scoreTd = document.createElement("td"); scoreTd.textContent = e.score ?? "—";
     const confTd = document.createElement("td"); confTd.textContent = e.confidence ?? "—";
     const spotTd = document.createElement("td"); spotTd.textContent = e.spot;
     tr.append(timeTd, statusTd, strikeTd, scoreTd, confTd, spotTd);
+    ["status_5m", "status_15m", "status_30m", "status_60m"].forEach((k) => {
+      const td = document.createElement("td");
+      const v = e[k] ?? "—";
+      td.className = statusCls(v);
+      td.textContent = v;
+      tr.appendChild(td);
+    });
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
