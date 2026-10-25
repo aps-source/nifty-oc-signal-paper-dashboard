@@ -59,7 +59,7 @@
   .zeroline { stroke: var(--text-muted); stroke-width: 1; }
   .axis-label { font-size: 10.5px; fill: var(--text-muted); }
   .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 480px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 780px; }
   thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
   thead th:first-child, tbody td:first-child { text-align: left; }
   tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -111,7 +111,9 @@
     Paper trade: 1 lot of the ATM strike, flat at day start, reversal closes+reopens, forced
     close at day end, new entries only 09:16&ndash;15:14 IST, no stop-loss or target &mdash; same
     mechanics as the main paper trader, just driven by the GEX rule above instead of the
-    price/OI/IV signal. PAPER ONLY, never a real order.
+    price/OI/IV signal. PAPER ONLY, never a real order. The "N ago" columns show what the
+    recommendation was 5/15/30/60 minutes before that row (same net-GEX/wall rule, just re-applied
+    to an earlier tick) -- a way to see how much it's been flipping, not a separate model.
   </footer>
 </div>
 
@@ -247,21 +249,52 @@ function gammaRec(e) {
   return "No Signal";
 }
 
-function renderTable(dayEntries) {
+function recColorOf(rec) { return rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)"; }
+
+function minutesOf(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+
+// "Recommendation N minutes ago (relative to this row)" -- same window-matching convention
+// (closest to the midpoint of a tolerance band) used server-side for the price/OI/IV model.
+// gamma_log.json already carries net_gex/spot/wall_strike for every tick, so this needs no
+// backend change: just re-run gammaRec() on an earlier row in the same day's array.
+const LOOKBACK_WINDOWS = { "5m": [3, 8], "15m": [10, 20], "30m": [22, 38], "60m": [50, 70] };
+function recNMinutesAgo(dayAsc, idx, windowKey) {
+  const [lo, hi] = LOOKBACK_WINDOWS[windowKey];
+  const mid = (lo + hi) / 2;
+  const nowMin = minutesOf(dayAsc[idx].time);
+  let best = null, bestDiff = Infinity;
+  for (let j = idx - 1; j >= 0; j--) {
+    const age = nowMin - minutesOf(dayAsc[j].time);
+    if (age > hi) break;
+    if (age < lo) continue;
+    const diff = Math.abs(age - mid);
+    if (diff < bestDiff) { bestDiff = diff; best = j; }
+  }
+  return best === null ? null : gammaRec(dayAsc[best]);
+}
+
+function renderTable(dayEntriesAsc) {
   const wrap = document.createElement("div"); wrap.className = "table-wrap";
   const table = document.createElement("table");
-  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th><th>Recommendation</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th><th>Recommendation</th>" +
+    "<th>5m ago</th><th>15m ago</th><th>30m ago</th><th>60m ago</th></tr></thead>";
   const tbody = document.createElement("tbody");
-  dayEntries.slice().reverse().forEach((e) => {
-    const tr = document.createElement("tr");
+  dayEntriesAsc.forEach((e, i) => {
     const dist = Math.abs(e.spot - e.wall_strike).toFixed(0);
     const rec = gammaRec(e);
-    const recColor = rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)";
-    tr.innerHTML = `<td style="text-align:left">${e.time}</td><td>${e.spot.toFixed(1)}</td>` +
+    const row = [
+      `<td style="text-align:left">${e.time}</td><td>${e.spot.toFixed(1)}</td>` +
       `<td style="color:${e.net_gex < 0 ? 'var(--critical)' : 'var(--good)'}">${fmtGex(e.net_gex)}</td>` +
       `<td>${e.wall_strike.toFixed(0)}</td><td>${dist}</td>` +
-      `<td style="color:${recColor};font-weight:700">${rec}</td>`;
-    tbody.appendChild(tr);
+      `<td style="color:${recColorOf(rec)};font-weight:700">${rec}</td>`,
+    ];
+    ["5m", "15m", "30m", "60m"].forEach((w) => {
+      const r = recNMinutesAgo(dayEntriesAsc, i, w);
+      row.push(`<td style="color:${r ? recColorOf(r) : 'var(--text-muted)'}">${r ?? "—"}</td>`);
+    });
+    const tr = document.createElement("tr");
+    tr.innerHTML = row.join("");
+    tbody.prepend(tr); // build ascending, display newest-first
   });
   table.appendChild(tbody);
   wrap.appendChild(table);
