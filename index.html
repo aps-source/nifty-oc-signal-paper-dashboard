@@ -483,11 +483,24 @@ function renderPanel(state) {
 }
 
 /* ------------------------------ KPI strip ------------------------------ */
+function dataDateInfo(iso) {
+  if (!iso) return { label: "—", sub: "" };
+  const d = new Date(iso);
+  const label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", weekday: "short", timeZone: "Asia/Kolkata" });
+  const dayMs = 24 * 60 * 60 * 1000;
+  const dataYMD = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const todayYMD = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const diffDays = Math.round((new Date(todayYMD) - new Date(dataYMD)) / dayMs);
+  const sub = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+  return { label, sub, stale: diffDays >= 1 };
+}
+
 function renderKpis(state) {
   const st = statusPill(state);
   const realized = Number(state.realized_pnl_today) || 0;
   const open = state.position;
   const allTime = state.all_time || {};
+  const dd = dataDateInfo(state.as_of);
 
   $("kpis").innerHTML = `
     <div class="kpi hero-kpi ${realized >= 0 ? "good" : "bad"}">
@@ -495,8 +508,9 @@ function renderKpis(state) {
       <div class="v ${realized >= 0 ? "good" : "bad"}">${rs(realized)}</div>
       <div class="s">${state.trades_today} trade${state.trades_today === 1 ? "" : "s"} today</div>
     </div>
+    <div class="kpi ${dd.stale ? "warn" : "good"}"><div class="k">Option chain date</div><div class="v" style="font-size:1.15rem;">${dd.label}</div><div class="s">${dd.sub}</div></div>
     <div class="kpi ${open ? (open.side === "CE" ? "blue" : "pink") : "teal"}"><div class="k">Open position</div><div class="v">${open ? open.side + " " + open.strike : "Flat"}</div><div class="s">${open ? `entered ${tm(open.entry_time)}` : "no position"}</div></div>
-    <div class="kpi ${st.cls === "live" ? "good" : st.cls === "preview" ? "warn" : "bad"}"><div class="k">Status</div><div class="v" style="font-size:1.1rem;"><span class="st-pill ${st.cls}"><span class="dot"></span>${st.label}</span></div><div class="s">as of ${tm(state.as_of)}</div></div>
+    <div class="kpi ${st.cls === "live" ? "good" : st.cls === "preview" ? "warn" : "bad"}"><div class="k">Status</div><div class="v" style="font-size:1.1rem;"><span class="st-pill ${st.cls}"><span class="dot"></span>${st.label}</span></div><div class="s">as of ${dtm(state.as_of)}</div></div>
     <div class="kpi"><div class="k">Overall signal</div><div class="v" style="font-size:1.1rem;">${state.overall}</div><div class="s">${state.confidence || "—"} &middot; strike ${state.strongest_strike ?? "—"}</div></div>
     <div class="kpi ${(allTime.win_pct ?? 50) >= 50 ? "good" : "warn"}"><div class="k">All-time (paper)</div><div class="v" style="font-size:1.1rem;">${allTime.trades ?? 0} trades</div><div class="s">${allTime.win_pct != null ? allTime.win_pct.toFixed(0) + "% win" : "—"} &middot; ${(allTime.net_points ?? 0).toFixed(1)} pts</div></div>
     <div class="kpi warn"><div class="k">Backtest context</div><div class="v" style="font-size:1.1rem;">47&ndash;57%</div><div class="s">win rate, 10 sessions &mdash; coin-flip, no edge found</div></div>
