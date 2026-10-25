@@ -331,15 +331,26 @@ async function initPaperTrade() {
   const statsEl = document.getElementById("posStats");
   const wins = trades.filter((t) => t.pnl_pts > 0).length;
   const net = trades.reduce((a, t) => a + (Number(t.pnl_rs) || 0), 0);
+  let dateLabel = "—", dateSub = "";
+  if (pos && pos.as_of) {
+    const d = new Date(pos.as_of);
+    dateLabel = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+    const dayMs = 24 * 60 * 60 * 1000;
+    const dataYMD = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    const todayYMD = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    const diffDays = Math.round((new Date(todayYMD) - new Date(dataYMD)) / dayMs);
+    dateSub = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+  }
   const tiles = [
+    ["Option chain date", dateLabel, "", dateSub],
     ["Recommendation right now", pos ? pos.recommendation : "—", pos && pos.recommendation === "Call Buy" ? "good" : pos && pos.recommendation === "Put Buy" ? "critical" : ""],
     ["Net GEX (last tick)", pos ? fmtGex(pos.net_gex) : "—", pos && pos.net_gex < 0 ? "critical" : "good"],
     ["Trades logged", trades.length, ""],
     ["Win rate", trades.length ? Math.round(100 * wins / trades.length) + "%" : "—", ""],
     ["Net P&L", rs(net), net >= 0 ? "good" : "critical"],
   ];
-  statsEl.innerHTML = tiles.map(([l, v, c]) =>
-    `<div class="stat"><div class="v" style="color:${c ? "var(--" + c + ")" : ""}">${v}</div><div class="l">${l}</div></div>`).join("");
+  statsEl.innerHTML = tiles.map(([l, v, c, sub]) =>
+    `<div class="stat"><div class="v" style="color:${c ? "var(--" + c + ")" : ""}">${v}</div><div class="l">${l}</div>${sub ? `<div class="l" style="margin-top:2px;">${sub}</div>` : ""}</div>`).join("");
 
   const posBox = document.getElementById("posBox");
   if (pos && pos.position) {
