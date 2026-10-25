@@ -339,7 +339,9 @@ async function initPaperTrade() {
     const dataYMD = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     const todayYMD = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     const diffDays = Math.round((new Date(todayYMD) - new Date(dataYMD)) / dayMs);
-    dateSub = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+    const age = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+    const expLabel = pos.expiry ? new Date(pos.expiry + "T00:00:00+05:30").toLocaleDateString("en-IN", { day: "2-digit", month: "short", timeZone: "Asia/Kolkata" }) : null;
+    dateSub = expLabel ? `Expiry ${expLabel} · ${age}` : age;
   }
   const tiles = [
     ["Option chain date", dateLabel, "", dateSub],
