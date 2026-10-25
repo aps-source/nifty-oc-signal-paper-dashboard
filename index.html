@@ -483,7 +483,7 @@ function renderPanel(state) {
 }
 
 /* ------------------------------ KPI strip ------------------------------ */
-function dataDateInfo(iso) {
+function dataDateInfo(iso, expiry) {
   if (!iso) return { label: "—", sub: "" };
   const d = new Date(iso);
   const label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", weekday: "short", timeZone: "Asia/Kolkata" });
@@ -491,7 +491,9 @@ function dataDateInfo(iso) {
   const dataYMD = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const todayYMD = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const diffDays = Math.round((new Date(todayYMD) - new Date(dataYMD)) / dayMs);
-  const sub = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+  const age = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+  const expLabel = expiry ? new Date(expiry + "T00:00:00+05:30").toLocaleDateString("en-IN", { day: "2-digit", month: "short", timeZone: "Asia/Kolkata" }) : null;
+  const sub = expLabel ? `Expiry ${expLabel} &middot; ${age}` : age;
   return { label, sub, stale: diffDays >= 1 };
 }
 
@@ -500,7 +502,7 @@ function renderKpis(state) {
   const realized = Number(state.realized_pnl_today) || 0;
   const open = state.position;
   const allTime = state.all_time || {};
-  const dd = dataDateInfo(state.as_of);
+  const dd = dataDateInfo(state.as_of, state.expiry);
 
   $("kpis").innerHTML = `
     <div class="kpi hero-kpi ${realized >= 0 ? "good" : "bad"}">
