@@ -118,6 +118,16 @@ function quadColor(q) {
   return "var(--text-muted)";
 }
 
+// same gate paper_tick.py applies to a NEW option entry: Long buildup -> Call Buy, Short
+// buildup -> Put Buy, everything else -> No Signal. Shown here for comparison with the
+// main signal, not a separate tradeable recommendation.
+function futRec(quadrant) {
+  if (quadrant === "Long buildup") return "Call Buy";
+  if (quadrant === "Short buildup") return "Put Buy";
+  return "No Signal";
+}
+function recColor(rec) { return rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)"; }
+
 function renderStats(dayEntries) {
   const row = document.createElement("div");
   row.className = "stat-row";
@@ -126,8 +136,10 @@ function renderStats(dayEntries) {
   ALL.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e); });
   const buildupPct = Math.round(100 * dayEntries.filter((e) => e.quadrant === "Long buildup" || e.quadrant === "Short buildup").length / dayEntries.length);
 
+  const lastRec = futRec(last.quadrant);
   const stats = [
     ["Ticks today", dayEntries.length, ""],
+    ["Recommendation (futures only)", lastRec, ""],
     ["Current quadrant", last.quadrant ?? "—", ""],
     ["Latest futures LTP", last.ltp.toFixed(1), ""],
     ["Latest futures OI", last.oi.toLocaleString("en-IN"), ""],
@@ -137,7 +149,7 @@ function renderStats(dayEntries) {
   stats.forEach(([label, val, cls]) => {
     const tile = document.createElement("div"); tile.className = "stat";
     const v = document.createElement("div"); v.className = "v";
-    v.style.color = label === "Current quadrant" ? quadColor(val) : (cls ? `var(--${cls})` : "");
+    v.style.color = label === "Current quadrant" ? quadColor(val) : label === "Recommendation (futures only)" ? recColor(val) : (cls ? `var(--${cls})` : "");
     v.textContent = val;
     const l = document.createElement("div"); l.className = "l"; l.textContent = label;
     tile.appendChild(v); tile.appendChild(l);
@@ -206,14 +218,16 @@ function renderChart(dayEntries) {
 function renderTable(dayEntriesAsc) {
   const wrap = document.createElement("div"); wrap.className = "table-wrap";
   const table = document.createElement("table");
-  table.innerHTML = "<thead><tr><th>Time</th><th>Futures LTP</th><th>Futures OI</th><th>Price chg (~15m)</th><th>OI chg (~15m)</th><th>Quadrant</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Time</th><th>Futures LTP</th><th>Futures OI</th><th>Price chg (~15m)</th><th>OI chg (~15m)</th><th>Quadrant</th><th>Recommendation</th></tr></thead>";
   const tbody = document.createElement("tbody");
   dayEntriesAsc.forEach((e) => {
+    const rec = futRec(e.quadrant);
     const tr = document.createElement("tr");
     tr.innerHTML = `<td style="text-align:left">${e.ts.slice(11, 16)}</td><td>${e.ltp.toFixed(1)}</td><td>${e.oi.toLocaleString("en-IN")}</td>` +
       `<td>${e.price_chg_pct != null ? (e.price_chg_pct >= 0 ? "+" : "") + e.price_chg_pct.toFixed(2) + "%" : "—"}</td>` +
       `<td>${e.oi_chg_pct != null ? (e.oi_chg_pct >= 0 ? "+" : "") + e.oi_chg_pct.toFixed(2) + "%" : "—"}</td>` +
-      `<td style="color:${quadColor(e.quadrant)};font-weight:700">${e.quadrant ?? "—"}</td>`;
+      `<td style="color:${quadColor(e.quadrant)}">${e.quadrant ?? "—"}</td>` +
+      `<td style="color:${recColor(rec)};font-weight:700">${rec}</td>`;
     tbody.prepend(tr); // build ascending, display newest-first
   });
   table.appendChild(tbody);
