@@ -1,6 +1,6 @@
 {
   "as_of": "2026-10-26T15:43:02+05:30",
-  "generated_at": "2026-10-26T20:14:57.779597",
+  "generated_at": "2026-10-26T20:16:57.387738",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -27,7 +27,7 @@
       "composite": 0.0
     }
   },
-  "futures_confirm": null,
+  "futures_confirm": "No data",
   "oi_metrics": {
     "spot": 22753.2,
     "resistance_strike": 23000.0,
