@@ -29968,5 +29968,20 @@
     "status_30m": "Put Buy",
     "status_60m": "Put Buy",
     "spot": 22702.55
+  },
+  {
+    "date": "2026-10-27",
+    "time": "13:31",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 12.0,
+    "strike": 23150.0,
+    "score": 12.0,
+    "confidence": "Strong",
+    "status_5m": "No Signal",
+    "status_15m": "Put Buy",
+    "status_30m": "Put Buy",
+    "status_60m": "Put Buy",
+    "spot": 22691.6
   }
 ]
