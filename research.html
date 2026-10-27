@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NIFTY Option-Chain Signal — Research</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f2f5fa;
+    --surface-1:      #ffffff;
+    --surface-2:      #e9edf5;
+    --text-primary:   #11151f;
+    --text-secondary: #5a6478;
+    --text-muted:     #838da2;
+    --gridline:       #dbe1ec;
+    --border:         rgba(17,21,31,0.12);
+    --accent:         #4a3aa7;
+    --accent-soft:    rgba(74,58,167,0.10);
+    --good:           #0ca30c;
+    --critical:       #d03b3b;
+    --warning:        #b5710a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page:           #0a0d14;
+      --surface-1:      #141a26;
+      --surface-2:      #1c2434;
+      --text-primary:   #eef1f8;
+      --text-secondary: #9aa4bd;
+      --text-muted:     #7c869e;
+      --gridline:       #262f42;
+      --border:         rgba(238,241,248,0.12);
+      --accent:         #9085e9;
+      --accent-soft:    rgba(144,133,233,0.16);
+      --good:           #28c840;
+      --critical:       #f0645f;
+      --warning:        #f2b636;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text-primary); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 20px 24px 40px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-bottom: 14px; }
+  h1 { font-size: 21px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  h2.section-h { font-size: 15px; margin: 26px 0 10px; }
+  .sub { color: var(--text-secondary); font-size: 15px; margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; padding-top: 3px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tab-btn { padding: 9px 18px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-1); font-family: inherit; font-weight: 700; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
+  .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
+
+  .banner { border: 1px solid var(--warning); background: color-mix(in srgb, var(--warning) 14%, var(--surface-1)); border-radius: 12px; padding: 14px 18px; font-size: 13.5px; line-height: 1.6; margin-bottom: 18px; }
+  .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 4px 0 18px; }
+  select { font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-key { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .legend-key.call { background: var(--good); }
+  .legend-key.put { background: var(--critical); }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat .v.call { color: var(--good); }
+  .stat .v.put { color: var(--critical); }
+  .stat .l { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 8px; margin-bottom: 18px; }
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .zeroline { stroke: var(--text-muted); stroke-width: 1; }
+  .axis-label { font-size: 10.5px; fill: var(--text-muted); }
+  .bar-call { fill: var(--good); }
+  .bar-put { fill: var(--critical); }
+  .bar-hit { fill: transparent; cursor: pointer; }
+
+  .tooltip { position: absolute; pointer-events: none; z-index: 5; background: var(--text-primary); color: var(--page); border-radius: 8px; padding: 8px 11px; font-size: 12.5px; line-height: 1.5; opacity: 0; transform: translate(-50%, -100%); transition: opacity 0.1s ease; max-width: 280px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  .tooltip .tt-head { font-size: 11px; opacity: 0.7; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+  .tooltip .tt-row { display: flex; align-items: flex-start; gap: 7px; }
+  .tooltip .tt-row + .tt-row { margin-top: 2px; }
+  .tooltip .tt-key { width: 9px; height: 9px; border-radius: 2px; flex: none; margin-top: 4px; }
+  .tooltip .tt-val { font-weight: 700; margin-left: auto; text-align: right; word-break: break-word; }
+
+  .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 640px; }
+  thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.status-call { color: var(--good); font-weight: 600; }
+  td.status-put { color: var(--critical); font-weight: 600; }
+  td.status-none { color: var(--text-muted); }
+
+  .empty-note { border: 1px dashed var(--border); border-radius: 12px; padding: 16px 18px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+  footer.tab-footer { padding: 18px 0 8px; font-size: 13px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Research</h1>
+      <div class="sub">Signal history, Gamma research &amp; Futures research &mdash; one page</div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Back to today</a>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="signal">Signal History</button>
+    <button class="tab-btn" data-tab="gamma">Gamma Research</button>
+    <button class="tab-btn" data-tab="futures">Futures Research</button>
+  </div>
+
+  <!-- ===================== SIGNAL ===================== -->
+  <section id="tab-signal" class="tab-section active">
+    <div class="controls">
+      <select id="sig-daySelect" aria-label="Select day"></select>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-key call"></span>Call Buy</span>
+        <span class="legend-item"><span class="legend-key put"></span>Put Buy</span>
+      </div>
+    </div>
+    <div id="sig-content"></div>
+    <footer class="tab-footer">
+      Reads signal_log.json &mdash; one entry per processed tick (de-duplicated by date+time).
+      Bar height is the signal's composite score (needs &ge;8 to count as a signal; &ge;12 is
+      Strong). The "alone" columns are a different, simpler read: full price+OI+IV agreement
+      (score &plusmn;3) on that ONE timeframe by itself, at any strike &mdash; not part of the
+      composite model and not traded, just a comparison. Kept for the last 90 days.
+    </footer>
+  </section>
+
+  <!-- ===================== GAMMA ===================== -->
+  <section id="tab-gamma" class="tab-section">
+    <div class="banner">
+      <b>Unvalidated rule, paper-traded on purpose to find out.</b> One day (2026-10-13) showed a
+      modest tilt (rank-corr |net GEX| vs next-12min move &asymp; 0.25) &mdash; pooled across all 12
+      backfilled days it was &rho;=&minus;0.04, essentially nothing. At the user's request this is
+      now paper-traded live anyway (negative GEX + spot above the gamma wall &rarr; Call Buy,
+      below &rarr; Put Buy; separate from, and never touching, the main signal paper trader) to get
+      a real couple of months of evidence instead of a one-day guess.
+    </div>
+
+    <div class="stat-row" id="gamma-posStats"></div>
+    <div class="chart-card" id="gamma-posBox" style="padding:16px 20px;"></div>
+
+    <h2 class="section-h">Gamma trade log</h2>
+    <div class="table-wrap" id="gamma-tradesTable" style="margin-bottom:24px;"></div>
+
+    <h2 class="section-h">GEX / spot history</h2>
+    <div class="controls">
+      <select id="gamma-daySelect" aria-label="Select day"></select>
+    </div>
+    <div id="gamma-content"></div>
+
+    <footer class="tab-footer">
+      Reads gamma_log.json &mdash; one entry per tick, logged by a separate task from
+      the paper trader (gamma_tick.py), pushed to this same site. Net GEX = (&Sigma;CE_OI&times;CE_gamma
+      &minus; &Sigma;PE_OI&times;PE_gamma) &times; spot&sup2; &times; 0.01 &times; lot size (retail
+      convention: negative = dealers net short gamma = hedging tends to amplify moves). Gamma wall =
+      the strike with the largest OI&times;gamma (CE+PE). Kept for the last 90 days.
+      Paper trade: 1 lot of the ATM strike, flat at day start, reversal closes+reopens, forced
+      close at day end, new entries only 09:16&ndash;15:14 IST, no stop-loss or target &mdash; same
+      mechanics as the main paper trader, just driven by the GEX rule above instead of the
+      price/OI/IV signal. PAPER ONLY, never a real order.
+    </footer>
+  </section>
+
+  <!-- ===================== FUTURES ===================== -->
+  <section id="tab-futures" class="tab-section">
+    <div class="banner">
+      <b>Not a futures trade &mdash; read-only data, never buys or sells the future.</b> Used only
+      as an extra condition before a NEW option entry: a Call Buy needs the futures quadrant to
+      show <b>Long buildup</b> (price up + OI up over the last ~15 min), a Put Buy needs
+      <b>Short buildup</b> (price down + OI up); otherwise the entry is skipped (reversal closes
+      and EOD force-close are never gated by this). Added 2026-10-26 -- no historical futures OI
+      existed for this project before then, so this is unvalidated; this tab exists to build that
+      track record going forward.
+    </div>
+
+    <div class="controls">
+      <select id="fut-daySelect" aria-label="Select day"></select>
+    </div>
+    <div id="fut-content"></div>
+
+    <footer class="tab-footer">
+      Reads futures_log.json &mdash; one entry per paper-trade tick (same 4-min cadence as the
+      option-chain collector), logged by the main paper trader (paper_tick.py). Quadrant: price up
+      + OI up = Long buildup (fresh longs), price down + OI up = Short buildup (fresh shorts), OI
+      down on either side = unwinding/covering (existing positions closing, not fresh conviction) =
+      Flat/weak. Threshold: both the price move and the OI move need to be &ge;0.5% over the
+      ~15-minute lookback, else classified Flat. Recommendation: Long buildup -> Call Buy, Short
+      buildup -> Put Buy, else No Signal -- the same gate applied to new option entries, shown here
+      for comparison. Kept for the last 90 days.
+    </footer>
+  </section>
+</div>
+
+<script>
+/* ======================= tab switching ======================= */
+document.querySelectorAll(".tab-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll(".tab-section").forEach((s) => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+</script>
+
+<script>
+/* ======================= SIGNAL tab ======================= */
+(function () {
+const LOG_URL = "signal_log.json";
+let ALL_ENTRIES = [];
+
+function renderStats(dayEntries) {
+  const callN = dayEntries.filter(e => e.status === "Call Buy").length;
+  const putN = dayEntries.filter(e => e.status === "Put Buy").length;
+  const noneN = dayEntries.length - callN - putN;
+  const stats = [
+    ["Ticks logged", dayEntries.length, ""],
+    ["Call Buy ticks", callN, "call"],
+    ["Put Buy ticks", putN, "put"],
+    ["No Signal / Mixed", noneN, ""],
+  ];
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v" + (cls ? " " + cls : ""); v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+const tooltip = document.createElement("div");
+tooltip.className = "tooltip";
+document.body.appendChild(tooltip);
+function showTooltip(x, y, html) {
+  tooltip.innerHTML = "";
+  html.forEach(n => tooltip.appendChild(n));
+  tooltip.style.left = x + "px";
+  tooltip.style.top = (y - 10) + "px";
+  tooltip.style.opacity = "1";
+}
+function hideTooltip() { tooltip.style.opacity = "0"; }
+function ttRow(color, label, value) {
+  const row = document.createElement("div"); row.className = "tt-row";
+  const key = document.createElement("span"); key.className = "tt-key"; key.style.background = color;
+  const lab = document.createElement("span"); lab.textContent = label;
+  const val = document.createElement("span"); val.className = "tt-val"; val.textContent = value;
+  row.appendChild(key); row.appendChild(lab); row.appendChild(val);
+  return row;
+}
+
+function renderChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 320, padL = 30, padR = 14, padT = 14, padB = 30;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const maxCount = Math.max(1, ...dayEntries.map(e => Math.max(e.call, e.put)));
+  const zeroY = padT + plotH / 2;
+  const scale = (plotH / 2 - 8) / maxCount;
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  [0, 0.5, 1].forEach(frac => {
+    const v = Math.round(maxCount * frac);
+    [zeroY - v * scale, zeroY + v * scale].forEach(y => {
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y, y2: y, class: v === 0 ? "zeroline" : "gridline" }));
+    });
+    if (v > 0) {
+      const labUp = el("text", { x: padL - 6, y: zeroY - v * scale + 3, class: "axis-label", "text-anchor": "end" });
+      labUp.textContent = v; svg.appendChild(labUp);
+      const labDown = el("text", { x: padL - 6, y: zeroY + v * scale + 3, class: "axis-label", "text-anchor": "end" });
+      labDown.textContent = v; svg.appendChild(labDown);
+    }
+  });
+
+  const n = dayEntries.length;
+  const slotW = plotW / n;
+  const barW = Math.min(20, slotW * 0.55);
+
+  dayEntries.forEach((e, i) => {
+    const cx = padL + slotW * i + slotW / 2;
+    const callH = e.call * scale, putH = e.put * scale;
+    const callBar = el("rect", { x: cx - barW / 2, y: zeroY - callH, width: barW, height: Math.max(0, callH), rx: 3, class: "bar-call" });
+    const putBar = el("rect", { x: cx - barW / 2, y: zeroY, width: barW, height: Math.max(0, putH), rx: 3, class: "bar-put" });
+    svg.appendChild(callBar); svg.appendChild(putBar);
+    const hit = el("rect", { x: cx - slotW / 2, y: padT, width: slotW, height: plotH, class: "bar-hit" });
+    hit.addEventListener("pointermove", (ev) => {
+      const r = svg.getBoundingClientRect();
+      const scaleX = r.width / W;
+      const rows = [
+        (() => { const h = document.createElement("div"); h.className = "tt-head"; h.textContent = e.time + " — " + e.status; return h; })(),
+        ttRow("var(--accent)", "Strike", e.strike ?? "—"),
+        ttRow("var(--text-muted)", "Confidence", e.confidence ?? "—"),
+        ttRow("var(--text-muted)", "Spot", e.spot),
+      ];
+      showTooltip(r.left + cx * scaleX, r.top + zeroY - Math.max(callH, 20) + window.scrollY, rows);
+    });
+    hit.addEventListener("pointerleave", hideTooltip);
+    svg.appendChild(hit);
+    if (i % 2 === 0 || n <= 16) {
+      const lab = el("text", { x: cx, y: H - 8, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time; svg.appendChild(lab);
+    }
+  });
+  card.appendChild(svg);
+  return card;
+}
+
+function statusCls(s) { return s === "Call Buy" ? "status-call" : s === "Put Buy" ? "status-put" : "status-none"; }
+
+function renderTable(dayEntries) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Status (composite)</th><th>Strike</th><th>Score</th><th>Confidence</th><th>Spot</th>" +
+    "<th>5m alone</th><th>15m alone</th><th>30m alone</th><th>60m alone</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntries.slice().reverse().forEach(e => {
+    const tr = document.createElement("tr");
+    const timeTd = document.createElement("td"); timeTd.textContent = e.time;
+    const statusTd = document.createElement("td"); statusTd.className = statusCls(e.status); statusTd.textContent = e.status;
+    const strikeTd = document.createElement("td"); strikeTd.textContent = e.strike ?? "—";
+    const scoreTd = document.createElement("td"); scoreTd.textContent = e.score ?? "—";
+    const confTd = document.createElement("td"); confTd.textContent = e.confidence ?? "—";
+    const spotTd = document.createElement("td"); spotTd.textContent = e.spot;
+    tr.append(timeTd, statusTd, strikeTd, scoreTd, confTd, spotTd);
+    ["status_5m", "status_15m", "status_30m", "status_60m"].forEach((k) => {
+      const td = document.createElement("td");
+      const v = e[k] ?? "—";
+      td.className = statusCls(v);
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("sig-content");
+  content.innerHTML = "";
+  const dayEntries = ALL_ENTRIES.filter(e => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+  if (dayEntries.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderChart(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("sig-content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL_ENTRIES = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load signal_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+  if (ALL_ENTRIES.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No signal history yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+  const dates = Array.from(new Set(ALL_ENTRIES.map(e => e.date))).sort().reverse();
+  const select = document.getElementById("sig-daySelect");
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+})();
+</script>
+
+<script>
+/* ======================= GAMMA tab ======================= */
+(function () {
+const LOG_URL = "gamma_log.json";
+let ALL = [];
+
+function fmtGex(v) {
+  const a = Math.abs(v);
+  const s = a >= 1e12 ? (a/1e12).toFixed(2)+"T" : a >= 1e9 ? (a/1e9).toFixed(2)+"B" : a.toFixed(0);
+  return (v < 0 ? "−" : "+") + s;
+}
+
+function spearman(xs, ys) {
+  const n = xs.length;
+  if (n < 5) return null;
+  const rank = (arr) => {
+    const idx = arr.map((v, i) => i).sort((a, b) => arr[a] - arr[b]);
+    const r = new Array(n);
+    idx.forEach((orig, pos) => { r[orig] = pos + 1; });
+    return r;
+  };
+  const rx = rank(xs), ry = rank(ys);
+  const mx = rx.reduce((a, b) => a + b, 0) / n, my = ry.reduce((a, b) => a + b, 0) / n;
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = rx[i] - mx, dy = ry[i] - my;
+    num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+  }
+  const denom = Math.sqrt(dx2 * dy2);
+  return denom ? num / denom : null;
+}
+
+function renderStats(dayEntries) {
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  const last = dayEntries[dayEntries.length - 1];
+  const negPct = Math.round(100 * dayEntries.filter((e) => e.net_gex < 0).length / dayEntries.length);
+  const pairs = [];
+  const byDay = {};
+  ALL.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e); });
+  Object.values(byDay).forEach((arr) => {
+    arr.sort((a, b) => a.time.localeCompare(b.time));
+    for (let i = 0; i < arr.length - 3; i++) {
+      pairs.push([Math.abs(arr[i].net_gex), Math.abs(arr[i + 3].spot - arr[i].spot)]);
+    }
+  });
+  const rho = spearman(pairs.map((p) => p[0]), pairs.map((p) => p[1]));
+  const stats = [
+    ["Ticks today", dayEntries.length, ""],
+    ["Negative-GEX ticks", negPct + "%", ""],
+    ["Net GEX (last tick)", fmtGex(last.net_gex), last.net_gex < 0 ? "critical" : "good"],
+    ["Days logged (all-time)", Object.keys(byDay).length, ""],
+    ["|GEX| vs next-12min move", rho == null ? "not enough days yet" : "ρ = " + rho.toFixed(2) + " (n=" + pairs.length + ")", ""],
+  ];
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v"; v.style.color = cls ? `var(--${cls})` : "";
+    v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+function renderChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 420, padL = 56, padR = 14, padT = 14, padMid = 20, padB = 30;
+  const topH = 220, botH = H - topH - padT - padMid - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  const n = dayEntries.length;
+  const plotW = W - padL - padR;
+  const x = (i) => padL + plotW * (i / (n - 1 || 1));
+
+  const spots = dayEntries.map((e) => e.spot);
+  const sMin = Math.min(...spots), sMax = Math.max(...spots), sSpan = (sMax - sMin) || 1;
+  const yTop = (v) => padT + topH - topH * ((v - sMin) / sSpan);
+  [0, 0.5, 1].forEach((f) => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + topH * (1 - f), y2: padT + topH * (1 - f), class: "gridline" })));
+  [sMin, (sMin + sMax) / 2, sMax].forEach((v, i) => {
+    const lab = el("text", { x: padL - 8, y: padT + topH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  });
+  const linePts = dayEntries.map((e, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${yTop(e.spot).toFixed(1)}`).join(" ");
+  svg.appendChild(el("path", { d: linePts, fill: "none", stroke: "var(--accent)", "stroke-width": "2" }));
+
+  const gexTop = padT + topH + padMid;
+  const gexs = dayEntries.map((e) => e.net_gex);
+  const gMax = Math.max(1, ...gexs.map(Math.abs));
+  const zeroY = gexTop + botH / 2;
+  const scale = (botH / 2 - 4) / gMax;
+  svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: zeroY, y2: zeroY, class: "zeroline" }));
+  const barW = Math.max(1.5, (plotW / n) * 0.6);
+  dayEntries.forEach((e, i) => {
+    const h = Math.abs(e.net_gex) * scale;
+    const bar = el("rect", {
+      x: x(i) - barW / 2, y: e.net_gex >= 0 ? zeroY - h : zeroY, width: barW, height: Math.max(h, 0.5),
+      fill: e.net_gex >= 0 ? "var(--good)" : "var(--critical)",
+    });
+    svg.appendChild(bar);
+  });
+  const gexLabel = el("text", { x: padL - 8, y: gexTop + 10, class: "axis-label", "text-anchor": "end" });
+  gexLabel.textContent = "GEX+"; svg.appendChild(gexLabel);
+  const gexLabel2 = el("text", { x: padL - 8, y: gexTop + botH - 4, class: "axis-label", "text-anchor": "end" });
+  gexLabel2.textContent = "GEX−"; svg.appendChild(gexLabel2);
+
+  const step = Math.max(1, Math.floor(n / 16));
+  dayEntries.forEach((e, i) => {
+    if (i % step === 0 || n <= 16) {
+      const lab = el("text", { x: x(i), y: H - 6, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time; svg.appendChild(lab);
+    }
+  });
+  card.appendChild(svg);
+  return card;
+}
+
+function gammaRec(e) {
+  if (e.net_gex < 0 && e.spot > e.wall_strike) return "Call Buy";
+  if (e.net_gex < 0 && e.spot < e.wall_strike) return "Put Buy";
+  return "No Signal";
+}
+function recColorOf(rec) { return rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)"; }
+function minutesOf(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+
+const LOOKBACK_WINDOWS = { "5m": [3, 8], "15m": [10, 20], "30m": [22, 38], "60m": [50, 70] };
+function recNMinutesAgo(dayAsc, idx, windowKey) {
+  const [lo, hi] = LOOKBACK_WINDOWS[windowKey];
+  const mid = (lo + hi) / 2;
+  const nowMin = minutesOf(dayAsc[idx].time);
+  let best = null, bestDiff = Infinity;
+  for (let j = idx - 1; j >= 0; j--) {
+    const age = nowMin - minutesOf(dayAsc[j].time);
+    if (age > hi) break;
+    if (age < lo) continue;
+    const diff = Math.abs(age - mid);
+    if (diff < bestDiff) { bestDiff = diff; best = j; }
+  }
+  return best === null ? null : gammaRec(dayAsc[best]);
+}
+
+function renderTable(dayEntriesAsc) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Spot</th><th>Net GEX</th><th>Gamma Wall</th><th>Dist to Wall</th><th>Recommendation</th>" +
+    "<th>5m ago</th><th>15m ago</th><th>30m ago</th><th>60m ago</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntriesAsc.forEach((e, i) => {
+    const dist = Math.abs(e.spot - e.wall_strike).toFixed(0);
+    const rec = gammaRec(e);
+    const row = [
+      `<td style="text-align:left">${e.time}</td><td>${e.spot.toFixed(1)}</td>` +
+      `<td style="color:${e.net_gex < 0 ? 'var(--critical)' : 'var(--good)'}">${fmtGex(e.net_gex)}</td>` +
+      `<td>${e.wall_strike.toFixed(0)}</td><td>${dist}</td>` +
+      `<td style="color:${recColorOf(rec)};font-weight:700">${rec}</td>`,
+    ];
+    ["5m", "15m", "30m", "60m"].forEach((w) => {
+      const r = recNMinutesAgo(dayEntriesAsc, i, w);
+      row.push(`<td style="color:${r ? recColorOf(r) : 'var(--text-muted)'}">${r ?? "—"}</td>`);
+    });
+    const tr = document.createElement("tr");
+    tr.innerHTML = row.join("");
+    tbody.prepend(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("gamma-content");
+  content.innerHTML = "";
+  const dayEntries = ALL.filter((e) => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+  if (!dayEntries.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderChart(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("gamma-content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load gamma_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+  if (!ALL.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No gamma data logged yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+  const dates = Array.from(new Set(ALL.map((e) => e.date))).sort().reverse();
+  const select = document.getElementById("gamma-daySelect");
+  dates.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+
+const rs = (v) => (v >= 0 ? "+" : "−") + "₹" + Math.abs(Math.round(v)).toLocaleString("en-IN");
+const tm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }) : "—";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+async function initPaperTrade() {
+  let pos = null, trades = [];
+  try {
+    pos = await (await fetch("gamma_position.json?t=" + Date.now(), { cache: "no-store" })).json();
+  } catch (e) { /* no position file yet -- fine before the first live tick */ }
+  try {
+    trades = await (await fetch("gamma_trades.json?t=" + Date.now(), { cache: "no-store" })).json();
+  } catch (e) { trades = []; }
+
+  const statsEl = document.getElementById("gamma-posStats");
+  const wins = trades.filter((t) => t.pnl_pts > 0).length;
+  const net = trades.reduce((a, t) => a + (Number(t.pnl_rs) || 0), 0);
+  let dateLabel = "—", dateSub = "";
+  if (pos && pos.as_of) {
+    const d = new Date(pos.as_of);
+    dateLabel = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+    const dayMs = 24 * 60 * 60 * 1000;
+    const dataYMD = d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    const todayYMD = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    const diffDays = Math.round((new Date(todayYMD) - new Date(dataYMD)) / dayMs);
+    const age = diffDays <= 0 ? "today's data" : diffDays === 1 ? "1 day old" : `${diffDays} days old`;
+    const expLabel = pos.expiry ? new Date(pos.expiry + "T00:00:00+05:30").toLocaleDateString("en-IN", { day: "2-digit", month: "short", timeZone: "Asia/Kolkata" }) : null;
+    dateSub = expLabel ? `Expiry ${expLabel} · ${age}` : age;
+  }
+  const tiles = [
+    ["Option chain date", dateLabel, "", dateSub],
+    ["Recommendation right now", pos ? pos.recommendation : "—", pos && pos.recommendation === "Call Buy" ? "good" : pos && pos.recommendation === "Put Buy" ? "critical" : ""],
+    ["Net GEX (last tick)", pos ? fmtGex(pos.net_gex) : "—", pos && pos.net_gex < 0 ? "critical" : "good"],
+    ["Trades logged", trades.length, ""],
+    ["Win rate", trades.length ? Math.round(100 * wins / trades.length) + "%" : "—", ""],
+    ["Net P&L", rs(net), net >= 0 ? "good" : "critical"],
+  ];
+  statsEl.innerHTML = tiles.map(([l, v, c, sub]) =>
+    `<div class="stat"><div class="v" style="color:${c ? "var(--" + c + ")" : ""}">${v}</div><div class="l">${l}</div>${sub ? `<div class="l" style="margin-top:2px;">${sub}</div>` : ""}</div>`).join("");
+
+  const posBox = document.getElementById("gamma-posBox");
+  if (pos && pos.position) {
+    const p = pos.position;
+    posBox.innerHTML = `<b>Open: ${p.side} ${p.strike}</b> &mdash; entered ${tm(p.entry_time)} @ ${p.entry_price}, last ${p.last_known_price} ` +
+      `(${(p.last_known_price - p.entry_price >= 0 ? "+" : "")}${(p.last_known_price - p.entry_price).toFixed(2)} pts)`;
+  } else {
+    posBox.innerHTML = `<span style="color:var(--text-muted)">Flat — no open gamma-theory position.</span>`;
+  }
+
+  const tbl = document.getElementById("gamma-tradesTable");
+  if (!trades.length) {
+    tbl.innerHTML = `<div class="empty-note">No gamma-theory trades yet — starts from today forward, not backfilled.</div>`;
+    return;
+  }
+  const rows = trades.map((t) => `<tr>
+      <td style="text-align:left">${t.date}</td>
+      <td style="text-align:left">${t.side}</td>
+      <td>${t.strike}</td>
+      <td>${tm(t.entry_time)}</td><td>${t.entry_price.toFixed(2)}</td>
+      <td>${tm(t.exit_time)}</td><td>${t.exit_price.toFixed(2)}</td>
+      <td style="text-align:left">${esc(t.reason)}</td>
+      <td style="color:${t.pnl_pts >= 0 ? "var(--good)" : "var(--critical)"}">${t.pnl_pts >= 0 ? "+" : ""}${t.pnl_pts.toFixed(2)}</td>
+      <td style="color:${t.pnl_rs >= 0 ? "var(--good)" : "var(--critical)"}">${rs(t.pnl_rs)}</td>
+    </tr>`).join("");
+  tbl.innerHTML = `<table><thead><tr><th style="text-align:left">Date</th><th style="text-align:left">Side</th><th>Strike</th><th>Entry</th><th>Buy px</th><th>Exit</th><th>Sell px</th><th style="text-align:left">Reason</th><th>Diff pts</th><th>P&amp;L</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+initPaperTrade();
+})();
+</script>
+
+<script>
+/* ======================= FUTURES tab ======================= */
+(function () {
+const LOG_URL = "futures_log.json";
+let ALL = [];
+
+function quadColor(q) {
+  if (q === "Long buildup") return "var(--good)";
+  if (q === "Short buildup") return "var(--critical)";
+  if (q === "Short covering" || q === "Long unwinding") return "var(--warning)";
+  return "var(--text-muted)";
+}
+function futRec(quadrant) {
+  if (quadrant === "Long buildup") return "Call Buy";
+  if (quadrant === "Short buildup") return "Put Buy";
+  return "No Signal";
+}
+function recColor(rec) { return rec === "Call Buy" ? "var(--good)" : rec === "Put Buy" ? "var(--critical)" : "var(--text-muted)"; }
+
+function renderStats(dayEntries) {
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  const last = dayEntries[dayEntries.length - 1];
+  const byDay = {};
+  ALL.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e); });
+  const buildupPct = Math.round(100 * dayEntries.filter((e) => e.quadrant === "Long buildup" || e.quadrant === "Short buildup").length / dayEntries.length);
+  const lastRec = futRec(last.quadrant);
+  const stats = [
+    ["Ticks today", dayEntries.length, ""],
+    ["Recommendation (futures only)", lastRec, ""],
+    ["Current quadrant", last.quadrant ?? "—", ""],
+    ["Latest futures LTP", last.ltp.toFixed(1), ""],
+    ["Latest futures OI", last.oi.toLocaleString("en-IN"), ""],
+    ["Buildup ticks today", buildupPct + "%", ""],
+    ["Days logged (all-time)", Object.keys(byDay).length, ""],
+  ];
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v";
+    v.style.color = label === "Current quadrant" ? quadColor(val) : label === "Recommendation (futures only)" ? recColor(val) : (cls ? `var(--${cls})` : "");
+    v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+function renderChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 420, padL = 64, padR = 14, padT = 14, padMid = 20, padB = 30;
+  const topH = 220, botH = H - topH - padT - padMid - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  const n = dayEntries.length;
+  const plotW = W - padL - padR;
+  const x = (i) => padL + plotW * (i / (n - 1 || 1));
+
+  const ltps = dayEntries.map((e) => e.ltp);
+  const lMin = Math.min(...ltps), lMax = Math.max(...ltps), lSpan = (lMax - lMin) || 1;
+  const yTop = (v) => padT + topH - topH * ((v - lMin) / lSpan);
+  [0, 0.5, 1].forEach((f) => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + topH * (1 - f), y2: padT + topH * (1 - f), class: "gridline" })));
+  [lMin, (lMin + lMax) / 2, lMax].forEach((v, i) => {
+    const lab = el("text", { x: padL - 8, y: padT + topH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  });
+  const linePts = dayEntries.map((e, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${yTop(e.ltp).toFixed(1)}`).join(" ");
+  svg.appendChild(el("path", { d: linePts, fill: "none", stroke: "var(--accent)", "stroke-width": "2" }));
+
+  const oiTop = padT + topH + padMid;
+  const ois = dayEntries.map((e) => e.oi);
+  const oMin = Math.min(...ois), oMax = Math.max(...ois), oSpan = (oMax - oMin) || 1;
+  const barH = (v) => ((v - oMin) / oSpan) * botH;
+  const barW = Math.max(1.5, (plotW / n) * 0.6);
+  dayEntries.forEach((e, i) => {
+    const h = Math.max(barH(e.oi), 0.5);
+    const bar = el("rect", { x: x(i) - barW / 2, y: oiTop + botH - h, width: barW, height: h, fill: quadColor(e.quadrant) });
+    svg.appendChild(bar);
+  });
+  const oiLabelTop = el("text", { x: padL - 8, y: oiTop + 10, class: "axis-label", "text-anchor": "end" });
+  oiLabelTop.textContent = (oMax / 1e6).toFixed(1) + "M"; svg.appendChild(oiLabelTop);
+  const oiLabelBot = el("text", { x: padL - 8, y: oiTop + botH - 2, class: "axis-label", "text-anchor": "end" });
+  oiLabelBot.textContent = (oMin / 1e6).toFixed(1) + "M"; svg.appendChild(oiLabelBot);
+  const oiTitle = el("text", { x: padL, y: oiTop - 6, class: "axis-label" });
+  oiTitle.textContent = "Futures OI (colored by quadrant)"; svg.appendChild(oiTitle);
+
+  const step = Math.max(1, Math.floor(n / 16));
+  dayEntries.forEach((e, i) => {
+    if (i % step === 0 || n <= 16) {
+      const lab = el("text", { x: x(i), y: H - 6, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.ts.slice(11, 16); svg.appendChild(lab);
+    }
+  });
+  card.appendChild(svg);
+  return card;
+}
+
+function renderTable(dayEntriesAsc) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Futures LTP</th><th>Futures OI</th><th>Price chg (~15m)</th><th>OI chg (~15m)</th><th>Quadrant</th><th>Recommendation</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntriesAsc.forEach((e) => {
+    const rec = futRec(e.quadrant);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td style="text-align:left">${e.ts.slice(11, 16)}</td><td>${e.ltp.toFixed(1)}</td><td>${e.oi.toLocaleString("en-IN")}</td>` +
+      `<td>${e.price_chg_pct != null ? (e.price_chg_pct >= 0 ? "+" : "") + e.price_chg_pct.toFixed(2) + "%" : "—"}</td>` +
+      `<td>${e.oi_chg_pct != null ? (e.oi_chg_pct >= 0 ? "+" : "") + e.oi_chg_pct.toFixed(2) + "%" : "—"}</td>` +
+      `<td style="color:${quadColor(e.quadrant)}">${e.quadrant ?? "—"}</td>` +
+      `<td style="color:${recColor(rec)};font-weight:700">${rec}</td>`;
+    tbody.prepend(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("fut-content");
+  content.innerHTML = "";
+  const dayEntries = ALL.filter((e) => e.date === date).sort((a, b) => a.ts.localeCompare(b.ts));
+  if (!dayEntries.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderChart(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("fut-content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load futures_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+  if (!ALL.length) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No futures data logged yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+  const dates = Array.from(new Set(ALL.map((e) => e.date))).sort().reverse();
+  const select = document.getElementById("fut-daySelect");
+  dates.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+})();
+</script>
+</body>
+</html>
