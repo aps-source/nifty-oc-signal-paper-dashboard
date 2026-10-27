@@ -515,17 +515,6 @@ function renderKpis(state) {
     <div class="kpi"><div class="k">Overall signal</div><div class="v" style="font-size:1.1rem;">${state.overall}</div><div class="s">${state.confidence || "—"} &middot; strike ${state.strongest_strike ?? "—"} &middot; futures: ${state.futures_confirm ?? "—"}</div></div>
     <div class="kpi ${(allTime.win_pct ?? 50) >= 50 ? "good" : "warn"}"><div class="k">All-time (paper)</div><div class="v" style="font-size:1.1rem;">${allTime.trades ?? 0} trades</div><div class="s">${allTime.win_pct != null ? allTime.win_pct.toFixed(0) + "% win" : "—"} &middot; ${(allTime.net_points ?? 0).toFixed(1)} pts</div></div>
     <div class="kpi warn"><div class="k">Backtest context</div><div class="v" style="font-size:1.1rem;">47&ndash;57%</div><div class="s">win rate, 10 sessions &mdash; coin-flip, no edge found</div></div>
-    ${renderBaselineKpis(state.baseline)}
-  `;
-}
-
-function renderBaselineKpis(baseline) {
-  if (!baseline) return "";
-  const open = baseline.position;
-  const allTime = baseline.all_time || {};
-  return `
-    <div class="kpi ${open ? (open.side === "CE" ? "blue" : "pink") : "teal"}"><div class="k">Baseline position (no futures gate)</div><div class="v">${open ? open.side + " " + open.strike : "Flat"}</div><div class="s">${open ? `entered ${tm(open.entry_time)}` : "no position"}</div></div>
-    <div class="kpi ${(allTime.win_pct ?? 50) >= 50 ? "good" : "warn"}"><div class="k">Baseline all-time</div><div class="v" style="font-size:1.1rem;">${allTime.trades ?? 0} trades</div><div class="s">${allTime.win_pct != null ? allTime.win_pct.toFixed(0) + "% win" : "—"} &middot; ${(allTime.net_points ?? 0).toFixed(1)} pts</div></div>
   `;
 }
 
