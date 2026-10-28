@@ -30748,5 +30748,20 @@
     "status_30m": "No Signal",
     "status_60m": "No Signal",
     "spot": 22500.9
+  },
+  {
+    "date": "2026-10-28",
+    "time": "10:35",
+    "status": "No Signal",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "status_5m": "No Signal",
+    "status_15m": "No Signal",
+    "status_30m": "No Signal",
+    "status_60m": "No Signal",
+    "spot": 22511.75
   }
 ]
