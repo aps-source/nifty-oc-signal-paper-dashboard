@@ -31363,5 +31363,20 @@
     "status_30m": "No Signal",
     "status_60m": "Call Buy",
     "spot": 22740.7
+  },
+  {
+    "date": "2026-10-28",
+    "time": "13:19",
+    "status": "Mixed",
+    "call": 0,
+    "put": 0,
+    "strike": null,
+    "score": null,
+    "confidence": null,
+    "status_5m": "No Signal",
+    "status_15m": "No Signal",
+    "status_30m": "No Signal",
+    "status_60m": "Call Buy",
+    "spot": 22707.4
   }
 ]
