@@ -356,27 +356,47 @@ function renderTable(dayEntries) {
   return wrap;
 }
 
-function renderPriceChart(date) {
+function renderPriceChart(dayEntries) {
   const card = document.createElement("div"); card.className = "chart-card";
-  const title = document.createElement("div");
-  title.style.cssText = "font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;";
-  title.textContent = "NIFTY spot -- " + date + (date === todayYMD() ? " (updates every 4 min)" : "");
-  const img = document.createElement("img");
-  img.style.cssText = "width:100%;height:auto;display:block;border-radius:8px;";
-  img.src = "charts/chart_" + date + ".png?t=" + (date === todayYMD() ? Date.now() : "static");
-  img.alt = "NIFTY spot chart, " + date;
-  img.onerror = () => { card.remove(); };
-  card.appendChild(title);
-  card.appendChild(img);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 220, padL = 56, padR = 14, padT = 14, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  const n = dayEntries.length;
+  const x = (i) => padL + plotW * (i / (n - 1 || 1));
+  const spots = dayEntries.map(e => e.spot);
+  const sMin = Math.min(...spots), sMax = Math.max(...spots), sSpan = (sMax - sMin) || 1;
+  const y = (v) => padT + plotH - plotH * ((v - sMin) / sSpan);
+
+  [0, 0.5, 1].forEach(f => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + plotH * (1 - f), y2: padT + plotH * (1 - f), class: "gridline" })));
+  [sMin, (sMin + sMax) / 2, sMax].forEach((v, i) => {
+    const lab = el("text", { x: padL - 8, y: padT + plotH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  });
+  const linePts = dayEntries.map((e, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(e.spot).toFixed(1)}`).join(" ");
+  svg.appendChild(el("path", { d: linePts, fill: "none", stroke: "var(--accent)", "stroke-width": "2" }));
+
+  const step = Math.max(1, Math.floor(n / 16));
+  dayEntries.forEach((e, i) => {
+    if (i % step === 0 || n <= 16) {
+      const lab = el("text", { x: x(i), y: H - 6, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time; svg.appendChild(lab);
+    }
+  });
+  card.appendChild(svg);
   return card;
 }
-function todayYMD() { return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); }
 
 function renderDay(date) {
   const content = document.getElementById("sig-content");
   content.innerHTML = "";
   const dayEntries = ALL_ENTRIES.filter(e => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
-  content.appendChild(renderPriceChart(date));
+  if (dayEntries.length > 0) content.appendChild(renderPriceChart(dayEntries));
   if (dayEntries.length === 0) {
     const note = document.createElement("div"); note.className = "empty-note";
     note.textContent = "No ticks logged for this day yet.";
