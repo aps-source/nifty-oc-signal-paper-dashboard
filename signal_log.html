@@ -287,10 +287,27 @@ function renderTable(dayEntries) {
   return wrap;
 }
 
+function renderPriceChart(date) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const title = document.createElement("div");
+  title.style.cssText = "font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;";
+  title.textContent = "NIFTY spot -- " + date + (date === todayYMD() ? " (updates every 4 min)" : "");
+  const img = document.createElement("img");
+  img.style.cssText = "width:100%;height:auto;display:block;border-radius:8px;";
+  img.src = "charts/chart_" + date + ".png?t=" + (date === todayYMD() ? Date.now() : "static");
+  img.alt = "NIFTY spot chart, " + date;
+  img.onerror = () => { card.remove(); };
+  card.appendChild(title);
+  card.appendChild(img);
+  return card;
+}
+function todayYMD() { return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); }
+
 function renderDay(date) {
   const content = document.getElementById("content");
   content.innerHTML = "";
   const dayEntries = ALL_ENTRIES.filter(e => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+  content.appendChild(renderPriceChart(date));
 
   if (dayEntries.length === 0) {
     const note = document.createElement("div"); note.className = "empty-note";
