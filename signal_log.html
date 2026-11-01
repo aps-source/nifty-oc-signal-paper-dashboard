@@ -301,7 +301,13 @@ function renderPriceChart(dayEntries) {
   const n = dayEntries.length;
   const x = (i) => padL + plotW * (i / (n - 1 || 1));
   const spots = dayEntries.map(e => e.spot);
-  const sMin = Math.min(...spots), sMax = Math.max(...spots), sSpan = (sMax - sMin) || 1;
+  // one synthetic candle per tick, same convention as the server-side chart_utils.py:
+  // open = previous tick's spot, close = this tick's spot (no finer intra-tick data for a real wick)
+  const opens = spots.map((s, i) => i === 0 ? s : spots[i - 1]);
+  const closes = spots;
+  const highs = opens.map((o, i) => Math.max(o, closes[i]));
+  const lows = opens.map((o, i) => Math.min(o, closes[i]));
+  const sMin = Math.min(...lows), sMax = Math.max(...highs), sSpan = (sMax - sMin) || 1;
   const y = (v) => padT + plotH - plotH * ((v - sMin) / sSpan);
 
   [0, 0.5, 1].forEach(f => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + plotH * (1 - f), y2: padT + plotH * (1 - f), class: "gridline" })));
@@ -309,8 +315,15 @@ function renderPriceChart(dayEntries) {
     const lab = el("text", { x: padL - 8, y: padT + plotH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
     lab.textContent = v.toFixed(0); svg.appendChild(lab);
   });
-  const linePts = dayEntries.map((e, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(e.spot).toFixed(1)}`).join(" ");
-  svg.appendChild(el("path", { d: linePts, fill: "none", stroke: "var(--accent)", "stroke-width": "2" }));
+  const slotW = plotW / (n || 1);
+  const bodyW = Math.max(1.5, slotW * 0.6);
+  dayEntries.forEach((e, i) => {
+    const up = closes[i] >= opens[i];
+    const color = up ? "var(--good)" : "var(--critical)";
+    svg.appendChild(el("line", { x1: x(i), x2: x(i), y1: y(highs[i]), y2: y(lows[i]), stroke: color, "stroke-width": "1" }));
+    const yTop = y(Math.max(opens[i], closes[i])), yBot = y(Math.min(opens[i], closes[i]));
+    svg.appendChild(el("rect", { x: x(i) - bodyW / 2, y: yTop, width: bodyW, height: Math.max(yBot - yTop, 1), fill: color }));
+  });
 
   const step = Math.max(1, Math.floor(n / 16));
   dayEntries.forEach((e, i) => {
