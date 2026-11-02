@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-11-02T15:35:02+05:30",
-  "generated_at": "2026-11-02T15:39:11.430306",
+  "as_of": "2026-11-02T15:39:02+05:30",
+  "generated_at": "2026-11-02T15:43:11.314714",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -15,29 +15,29 @@
   "checklist": {
     "strike": 23450.0,
     "ce": {
-      "5m": 2.0,
+      "5m": -3.0,
       "15m": 1.0,
       "60m": 1.0,
-      "composite": 7.0
+      "composite": 2.0
     },
     "pe": {
-      "5m": -2.0,
+      "5m": 3.0,
       "15m": -1.0,
       "60m": -1.0,
-      "composite": -7.0
+      "composite": -2.0
     }
   },
   "futures_confirm": "Flat",
   "oi_metrics": {
     "spot": 23440.8,
     "resistance_strike": 23500.0,
-    "resistance_oi": 12072905.0,
+    "resistance_oi": 11517805.0,
     "support_strike": 23000.0,
-    "support_oi": 14694355.0,
+    "support_oi": 14692470.0,
     "max_pain": 23300.0,
-    "pcr": 0.697,
+    "pcr": 0.725,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 6522880.0
+    "atm_straddle_oi": 6166290.0
   },
   "position": null,
   "trades_today": 12,
