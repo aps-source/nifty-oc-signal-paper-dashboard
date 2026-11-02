@@ -3049,5 +3049,14 @@
     "price_chg_pct": null,
     "oi_chg_pct": null,
     "quadrant": "No data"
+  },
+  {
+    "date": "2026-11-02",
+    "ts": "2026-11-02 09:19:04",
+    "ltp": 23335.0,
+    "oi": 15468505.0,
+    "price_chg_pct": null,
+    "oi_chg_pct": null,
+    "quadrant": "No data"
   }
 ]
