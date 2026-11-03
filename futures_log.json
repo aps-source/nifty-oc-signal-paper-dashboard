@@ -4372,5 +4372,14 @@
     "price_chg_pct": 0.023,
     "oi_chg_pct": -0.253,
     "quadrant": "Flat"
+  },
+  {
+    "date": "2026-11-03",
+    "ts": "2026-11-03 13:51:03",
+    "ltp": 23778.9,
+    "oi": 14526850.0,
+    "price_chg_pct": -0.067,
+    "oi_chg_pct": -0.217,
+    "quadrant": "Flat"
   }
 ]
