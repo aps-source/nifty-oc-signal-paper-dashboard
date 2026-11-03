@@ -1,20 +1,20 @@
 {
-  "as_of": "2026-11-03 11:55:02",
-  "spot": 23689.5,
-  "net_gex": 407754032296.88336,
+  "as_of": "2026-11-03 11:59:02",
+  "spot": 23692.85,
+  "net_gex": -10747169469391.95,
   "wall_strike": 23700.0,
   "expiry": "2026-11-03",
-  "recommendation": "No Signal",
+  "recommendation": "Put Buy",
   "position": {
-    "side": "CE",
-    "strike": 23650.0,
-    "entry_time": "2026-11-03 10:39:02",
+    "side": "PE",
+    "strike": 23700.0,
+    "entry_time": "2026-11-03 11:59:02",
     "date": "2026-11-03",
-    "entry_price": 55.65,
-    "last_known_price": 69.45,
+    "entry_price": 58.35,
+    "last_known_price": 58.35,
     "qty": 65,
     "expiry": "2026-11-03",
-    "net_gex_at_entry": -7737816909327.3,
-    "wall_strike_at_entry": 23600.0
+    "net_gex_at_entry": -10747169469391.9,
+    "wall_strike_at_entry": 23700.0
   }
 }
