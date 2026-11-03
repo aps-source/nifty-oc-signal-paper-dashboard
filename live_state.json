@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-11-03T14:07:02+05:30",
-  "generated_at": "2026-11-03T14:11:24.593379",
+  "as_of": "2026-11-03T14:11:03+05:30",
+  "generated_at": "2026-11-03T14:15:13.406598",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 23710.45,
+  "spot": 23700.9,
   "atm": 23700.0,
   "expiry": "2026-11-03",
   "overall": "No Signal",
@@ -17,34 +17,34 @@
     "ce": {
       "5m": -1.0,
       "15m": -1.0,
-      "60m": 2.0,
-      "composite": 3.0
+      "60m": 0.0,
+      "composite": -3.0
     },
     "pe": {
-      "5m": 1.0,
+      "5m": 2.0,
       "15m": 1.0,
       "60m": -2.0,
-      "composite": -3.0
+      "composite": -2.0
     }
   },
   "futures_confirm": "Flat",
   "oi_metrics": {
-    "spot": 23710.45,
+    "spot": 23700.9,
     "resistance_strike": 23800.0,
-    "resistance_oi": 31520320.0,
+    "resistance_oi": 32034275.0,
     "support_strike": 23600.0,
-    "support_oi": 41593695.0,
+    "support_oi": 40910155.0,
     "max_pain": 23700.0,
-    "pcr": 1.21,
+    "pcr": 1.191,
     "pcr_suggestion": "CALL",
-    "atm_straddle_oi": 63660740.0
+    "atm_straddle_oi": 63950250.0
   },
   "position": {
     "side": "PE",
     "strike": 23700.0,
     "entry_time": "2026-11-03T13:55:03+05:30",
     "entry_price": 28.3,
-    "last_known_price": 32.25,
+    "last_known_price": 36.8,
     "qty": 65,
     "expiry": "2026-11-03"
   },
