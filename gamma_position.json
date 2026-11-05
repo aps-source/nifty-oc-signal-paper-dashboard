@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-11-05 09:55:05",
-  "spot": 24440.6,
-  "net_gex": 14860888109310.53,
-  "wall_strike": 24300.0,
+  "as_of": "2026-11-05 09:59:04",
+  "spot": 24416.05,
+  "net_gex": 12700833815422.602,
+  "wall_strike": 24400.0,
   "expiry": "2026-11-09",
   "recommendation": "No Signal",
   "position": null
