@@ -1,19 +1,19 @@
 {
-  "as_of": "2026-11-09T09:51:03+05:30",
-  "generated_at": "2026-11-09T09:55:26.851388",
+  "as_of": "2026-11-09T09:55:03+05:30",
+  "generated_at": "2026-11-09T09:59:28.954383",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 24942.25,
-  "atm": 24950.0,
+  "spot": 24920.95,
+  "atm": 24900.0,
   "expiry": "2026-11-09",
-  "overall": "No Signal",
-  "strongest_strike": null,
-  "strongest_score": null,
-  "confidence": null,
+  "overall": "Put Buy",
+  "strongest_strike": 25300.0,
+  "strongest_score": 9.0,
+  "confidence": "Moderate",
   "data_quality": "Partial history",
   "checklist": {
-    "strike": 24950.0,
+    "strike": 25300.0,
     "ce": {
       "5m": -2.0,
       "15m": -2.0,
@@ -21,30 +21,30 @@
       "composite": -6.0
     },
     "pe": {
-      "5m": -2.0,
-      "15m": -2.0,
+      "5m": 3.0,
+      "15m": 3.0,
       "60m": null,
-      "composite": -6.0
+      "composite": 9.0
     }
   },
   "futures_confirm": "Flat",
   "oi_metrics": {
-    "spot": 24942.25,
+    "spot": 24920.95,
     "resistance_strike": 25000.0,
-    "resistance_oi": 24494795.0,
+    "resistance_oi": 25057825.0,
     "support_strike": 24900.0,
-    "support_oi": 18993455.0,
+    "support_oi": 19734975.0,
     "max_pain": 24950.0,
-    "pcr": 0.809,
-    "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 26976170.0
+    "pcr": 0.921,
+    "pcr_suggestion": "NEUTRAL",
+    "atm_straddle_oi": 30386330.0
   },
   "position": {
     "side": "PE",
     "strike": 24950.0,
     "entry_time": "2026-11-09T09:31:15+05:30",
     "entry_price": 102.95,
-    "last_known_price": 91.25,
+    "last_known_price": 101.7,
     "qty": 65,
     "expiry": "2026-11-09"
   },
