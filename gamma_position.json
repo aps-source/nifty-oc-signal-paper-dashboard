@@ -1,7 +1,7 @@
 {
-  "as_of": "2026-11-09 15:23:02",
+  "as_of": "2026-11-09 15:27:02",
   "spot": 25003.65,
-  "net_gex": -64034770472942.15,
+  "net_gex": -361623939827615.44,
   "wall_strike": 25000.0,
   "expiry": "2026-11-09",
   "recommendation": "Call Buy",
@@ -11,7 +11,7 @@
     "entry_time": "2026-11-09 15:11:03",
     "date": "2026-11-09",
     "entry_price": 68.05,
-    "last_known_price": 32.35,
+    "last_known_price": 44.9,
     "qty": 65,
     "expiry": "2026-11-09",
     "net_gex_at_entry": -36676090582085.0,
