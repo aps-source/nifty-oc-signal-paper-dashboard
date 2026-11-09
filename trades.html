@@ -52,6 +52,8 @@
   .side-pill { font-weight: 800; font-size: 0.72rem; padding: 0.12rem 0.55rem; border-radius: 999px; color: #fff; }
   .side-pill.CE { background: var(--call); } .side-pill.PE { background: var(--put); }
   .reason-pill { font-size: 0.76rem; font-weight: 600; padding: 0.12rem 0.6rem; border-radius: 999px; background: var(--surface-2); color: var(--text-secondary); }
+  .rule-pill { font-size: 0.72rem; font-weight: 700; padding: 0.12rem 0.55rem; border-radius: 999px; color: #fff; }
+  .rule-pill.old { background: var(--text-muted); } .rule-pill.new { background: var(--accent); }
   .pos-pnl-cell { color: var(--good); font-weight: 700; } .neg-pnl-cell { color: var(--critical); font-weight: 700; }
   .empty-row td { color: var(--text-muted); text-align: center; padding: 1.1rem; white-space: normal; }
   .table-wrap { overflow-x: auto; }
@@ -78,16 +80,24 @@
           <option value="CE">Call (CE) only</option>
           <option value="PE">Put (PE) only</option>
         </select>
+        <select id="filterRule">
+          <option value="">Both entry rules</option>
+          <option value="old">Earlier plan (pre 11-09)</option>
+          <option value="new">2x confirm (11-09+)</option>
+        </select>
       </div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Date</th><th>Expiry</th><th>Side</th><th>Strike</th><th>Entry</th><th>Buy px</th><th>Exit</th><th>Sell px</th><th>Reason</th><th>Diff pts</th><th>Gain/Loss Rs</th></tr></thead>
-        <tbody id="rows"><tr class="empty-row"><td colspan="11">Loading…</td></tr></tbody>
+        <thead><tr><th>Date</th><th>Expiry</th><th>Side</th><th>Strike</th><th>Entry</th><th>Buy px</th><th>Exit</th><th>Sell px</th><th>Reason</th><th>Rule</th><th>Diff pts</th><th>Gain/Loss Rs</th></tr></thead>
+        <tbody id="rows"><tr class="empty-row"><td colspan="12">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
-  <footer>Paper trades only. Only NIFTY is traded by this project, so there's no instrument filter -- Call/Put, date and month cover it.</footer>
+  <footer>Paper trades only. Only NIFTY is traded by this project, so there's no instrument filter -- Call/Put, date and month cover it.
+  "Rule" = which entry/exit debounce was live when that trade was entered: the earlier plan
+  (no debounce through 2026-10-25, then a time-based 16-min hold from 2026-10-26) or the
+  current count-based 2x-confirm, live from 2026-11-09.</footer>
 </main>
 <script>
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -96,6 +106,11 @@ const tm = (iso) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-d
 const dm = (iso) => iso ? new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "2-digit", timeZone: "Asia/Kolkata" }) : "—";
 
 let ALL_TRADES = [];
+
+// when CONFIRM_TICKS=2 (count-based) replaced the earlier plan (no debounce, then a
+// time-based 16-min hold from 2026-10-26) -- the deploy commit's own timestamp
+const RULE_CUTOFF = new Date("2026-11-09T16:41:21+05:30").getTime();
+function ruleOf(t) { return new Date(t.entry_time).getTime() >= RULE_CUTOFF ? "new" : "old"; }
 
 function monthKey(dateStr) { return dateStr.slice(0, 7); } // "2026-10-13" -> "2026-10"
 
@@ -128,10 +143,12 @@ function applyFilters() {
   const month = document.getElementById("filterMonth").value;
   const date = document.getElementById("filterDate").value;
   const side = document.getElementById("filterSide").value;
+  const rule = document.getElementById("filterRule").value;
   const filtered = ALL_TRADES.filter((t) =>
     (!month || monthKey(t.date) === month) &&
     (!date || t.date === date) &&
-    (!side || t.side === side));
+    (!side || t.side === side) &&
+    (!rule || ruleOf(t) === rule));
   render(filtered);
 }
 
@@ -141,7 +158,9 @@ function render(trades) {
   document.getElementById("summary").innerHTML =
     `<span><b>${trades.length}</b> trades</span><span><b>${trades.length ? Math.round(100 * wins / trades.length) : 0}%</b> win</span><span><b style="color:${net >= 0 ? 'var(--good)' : 'var(--critical)'}">${rs(net)}</b> net</span>`;
   document.getElementById("rows").innerHTML = trades.length
-    ? trades.map((t) => `
+    ? trades.map((t) => {
+      const rule = ruleOf(t);
+      return `
       <tr>
         <td>${t.date}</td><td>${t.expiry}</td>
         <td><span class="side-pill ${t.side}">${t.side}</span></td>
@@ -149,10 +168,12 @@ function render(trades) {
         <td>${tm(t.entry_time)}</td><td>${t.entry_price.toFixed(2)}</td>
         <td>${tm(t.exit_time)}</td><td>${t.exit_price.toFixed(2)}</td>
         <td><span class="reason-pill">${esc(t.reason)}</span></td>
+        <td><span class="rule-pill ${rule}">${rule === "new" ? "2x confirm" : "earlier plan"}</span></td>
         <td class="${t.pnl_pts >= 0 ? 'pos-pnl-cell' : 'neg-pnl-cell'}">${t.pnl_pts >= 0 ? "+" : ""}${t.pnl_pts.toFixed(2)}</td>
         <td class="${t.pnl_rs >= 0 ? 'pos-pnl-cell' : 'neg-pnl-cell'}">${rs(t.pnl_rs)}</td>
-      </tr>`).join("")
-    : '<tr class="empty-row"><td colspan="11">No trades match these filters.</td></tr>';
+      </tr>`;
+    }).join("")
+    : '<tr class="empty-row"><td colspan="12">No trades match these filters.</td></tr>';
 }
 
 fetch("trade_log.json?t=" + Date.now(), { cache: "no-store" })
@@ -165,6 +186,7 @@ fetch("trade_log.json?t=" + Date.now(), { cache: "no-store" })
     document.getElementById("filterMonth").addEventListener("change", () => { refreshDateOptions(); applyFilters(); });
     document.getElementById("filterDate").addEventListener("change", applyFilters);
     document.getElementById("filterSide").addEventListener("change", applyFilters);
+    document.getElementById("filterRule").addEventListener("change", applyFilters);
   })
   .catch((e) => {
     document.getElementById("rows").innerHTML = `<tr class="empty-row"><td colspan="11">Failed to load trade_log.json — ${esc(e.message)}</td></tr>`;
