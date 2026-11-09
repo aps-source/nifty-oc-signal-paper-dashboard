@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-11-09T15:39:02+05:30",
-  "generated_at": "2026-11-09T15:43:21.580681",
+  "as_of": "2026-11-09T15:43:04+05:30",
+  "generated_at": "2026-11-09T15:47:17.041231",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -21,23 +21,23 @@
       "composite": -15.0
     },
     "pe": {
-      "5m": -3.0,
-      "15m": -1.0,
+      "5m": 0.0,
+      "15m": -2.0,
       "60m": -2.0,
-      "composite": -11.0
+      "composite": -10.0
     }
   },
   "futures_confirm": "Flat",
   "oi_metrics": {
     "spot": 25044.65,
     "resistance_strike": 25050.0,
-    "resistance_oi": 14991665.0,
+    "resistance_oi": 14379950.0,
     "support_strike": 25000.0,
-    "support_oi": 17872075.0,
+    "support_oi": 17760470.0,
     "max_pain": 25000.0,
-    "pcr": 0.876,
+    "pcr": 0.873,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 22360260.0
+    "atm_straddle_oi": 21622055.0
   },
   "position": null,
   "trades_today": 8,
