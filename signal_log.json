@@ -44188,5 +44188,35 @@
     "status_30m": "No Signal",
     "status_60m": "No Signal",
     "spot": 25344.75
+  },
+  {
+    "date": "2026-11-11",
+    "time": "10:19",
+    "status": "Call Buy",
+    "call": 14.0,
+    "put": 0,
+    "strike": 25250.0,
+    "score": 14.0,
+    "confidence": "Strong",
+    "status_5m": "No Signal",
+    "status_15m": "No Signal",
+    "status_30m": "Call Buy",
+    "status_60m": "No Signal",
+    "spot": 25367.0
+  },
+  {
+    "date": "2026-11-11",
+    "time": "10:19",
+    "status": "Put Buy",
+    "call": 0,
+    "put": 14.0,
+    "strike": 25050.0,
+    "score": 14.0,
+    "confidence": "Strong",
+    "status_5m": "Call Buy",
+    "status_15m": "Call Buy",
+    "status_30m": "No Signal",
+    "status_60m": "No Signal",
+    "spot": 25356.5
   }
 ]
