@@ -1,0 +1,304 @@
+{
+  "name": "OCORBCPR",
+  "full_name": "NIFTY Opening-Range-Breakout(15m) + CPR confirmation",
+  "generated": "2026-11-11",
+  "window": "2026-10-12 to 2026-11-09 (20 live-logged trading days)",
+  "rule": "Call Buy only once spot is above BOTH the first-15-minute opening-range high (09:15-09:30) AND the day's CPR Top Central (TC). Put Buy only once spot is below BOTH the OR-15 low AND CPR Bottom Central (BC). Otherwise flat. CPR TC/BC = Pivot=(H+L+C)/3, BC=(H+L)/2, TC=2*Pivot-BC from the PREVIOUS day's completed OHLC. 1 lot of the ATM strike (CE/PE, always bought, never written). Pure reversal exit: an opposite-condition tick closes and reopens immediately, no debounce, no target/stop-loss. Forced close at the last snapshot of the day (EOD). Entries only 09:16-15:14 IST and only once the opening range has closed (09:30).",
+  "status": "LIVE since 2026-11-11 -- this is the rule the paper loop now actually trades (engine.py's composite 5m/15m/60m score model still runs every tick but is logged for comparison only, it no longer opens or closes any position).",
+  "summary": {
+    "n": 18,
+    "win_pct": 61.1,
+    "net_pts": 743.6,
+    "net_rs": 48334.0
+  },
+  "by_side": {
+    "CE": {
+      "n": 12,
+      "win_pct": 58.3,
+      "net_pts": 740.4,
+      "net_rs": 48129.0
+    },
+    "PE": {
+      "n": 6,
+      "win_pct": 66.7,
+      "net_pts": 3.1,
+      "net_rs": 205.0
+    }
+  },
+  "by_exit_reason": {
+    "EOD": {
+      "n": 17,
+      "win_pct": 64.7,
+      "net_pts": 819.5,
+      "net_rs": 53268.0
+    },
+    "reversal": {
+      "n": 1,
+      "win_pct": 0.0,
+      "net_pts": -75.9,
+      "net_rs": -4934.0
+    }
+  },
+  "comparisons": [
+    {
+      "label": "ORB15+CPR, pure reversal (THIS, now live)",
+      "n": 18,
+      "win_pct": 61.1,
+      "net_pts": 743.6
+    },
+    {
+      "label": "ORB15+CPR, target 20% / SL 40%",
+      "n": 85,
+      "win_pct": 68.2,
+      "net_pts": 545.7
+    },
+    {
+      "label": "ORB15+CPR, target 20% / SL 20%",
+      "n": 132,
+      "win_pct": 56.8,
+      "net_pts": 537.8
+    },
+    {
+      "label": "CPR only (no ORB filter)",
+      "n": 31,
+      "win_pct": 48.4,
+      "net_pts": 584.0
+    },
+    {
+      "label": "ORB15 only (no CPR filter)",
+      "n": null,
+      "win_pct": null,
+      "net_pts": null
+    },
+    {
+      "label": "Composite model, 2x-confirm (old live rule until 2026-11-11)",
+      "n": null,
+      "win_pct": null,
+      "net_pts": null
+    }
+  ],
+  "warnings": [
+    "Only 18 trades over 20 days -- the thinnest sample of any variant tested, nowhere near enough to separate skill from luck.",
+    "The entire backtest window is one continuous NIFTY rally (~22,600 -> ~25,000+). CE carries almost all of the net points; the PE side is a coin flip on a handful of trades. A flat or falling market has not been tested.",
+    "No shuffle-null or holdout control has been run on this specific rule.",
+    "This was chosen over two bracket-exit variants (20%/40%, 20%/20%) because it had the best net points in-sample, not because it was validated out-of-sample -- a classic overfitting trap. Watch live results, don't assume this holds."
+  ],
+  "trades": [
+    {
+      "date": "2026-10-12",
+      "side": "PE",
+      "strike": 22450.0,
+      "entry_time": "2026-10-12 10:59:02",
+      "entry_price": 102.85,
+      "exit_time": "2026-10-12 15:43:03",
+      "exit_price": 145.0,
+      "exit_reason": "EOD",
+      "pnl_points": 42.15,
+      "pnl_rupees": 2739.75
+    },
+    {
+      "date": "2026-10-13",
+      "side": "CE",
+      "strike": 22500.0,
+      "entry_time": "2026-10-13 09:35:03",
+      "entry_price": 63.5,
+      "exit_time": "2026-10-13 15:43:02",
+      "exit_price": 221.5,
+      "exit_reason": "EOD",
+      "pnl_points": 158.0,
+      "pnl_rupees": 10270.0
+    },
+    {
+      "date": "2026-10-15",
+      "side": "CE",
+      "strike": 22750.0,
+      "entry_time": "2026-10-15 09:39:02",
+      "entry_price": 140.35,
+      "exit_time": "2026-10-15 10:59:02",
+      "exit_price": 255.0,
+      "exit_reason": "EOD",
+      "pnl_points": 114.65,
+      "pnl_rupees": 7452.25
+    },
+    {
+      "date": "2026-10-16",
+      "side": "CE",
+      "strike": 23100.0,
+      "entry_time": "2026-10-16 10:15:04",
+      "entry_price": 93.9,
+      "exit_time": "2026-10-16 15:43:02",
+      "exit_price": 84.95,
+      "exit_reason": "EOD",
+      "pnl_points": -8.95,
+      "pnl_rupees": -581.75
+    },
+    {
+      "date": "2026-10-19",
+      "side": "PE",
+      "strike": 22950.0,
+      "entry_time": "2026-10-19 12:07:03",
+      "entry_price": 54.75,
+      "exit_time": "2026-10-19 15:35:02",
+      "exit_price": 61.0,
+      "exit_reason": "EOD",
+      "pnl_points": 6.25,
+      "pnl_rupees": 406.25
+    },
+    {
+      "date": "2026-10-21",
+      "side": "CE",
+      "strike": 23100.0,
+      "entry_time": "2026-10-21 09:31:05",
+      "entry_price": 168.7,
+      "exit_time": "2026-10-21 11:23:04",
+      "exit_price": 92.8,
+      "exit_reason": "reversal",
+      "pnl_points": -75.9,
+      "pnl_rupees": -4933.5
+    },
+    {
+      "date": "2026-10-21",
+      "side": "PE",
+      "strike": 22900.0,
+      "entry_time": "2026-10-21 11:23:04",
+      "entry_price": 164.4,
+      "exit_time": "2026-10-21 15:43:02",
+      "exit_price": 260.9,
+      "exit_reason": "EOD",
+      "pnl_points": 96.5,
+      "pnl_rupees": 6272.5
+    },
+    {
+      "date": "2026-10-23",
+      "side": "PE",
+      "strike": 22650.0,
+      "entry_time": "2026-10-23 09:51:03",
+      "entry_price": 126.15,
+      "exit_time": "2026-10-23 15:43:02",
+      "exit_price": 167.2,
+      "exit_reason": "EOD",
+      "pnl_points": 41.05,
+      "pnl_rupees": 2668.25
+    },
+    {
+      "date": "2026-10-26",
+      "side": "CE",
+      "strike": 22650.0,
+      "entry_time": "2026-10-26 09:59:02",
+      "entry_price": 176.2,
+      "exit_time": "2026-10-26 15:43:02",
+      "exit_price": 171.0,
+      "exit_reason": "EOD",
+      "pnl_points": -5.2,
+      "pnl_rupees": -338.0
+    },
+    {
+      "date": "2026-10-27",
+      "side": "CE",
+      "strike": 22800.0,
+      "entry_time": "2026-10-27 10:06:31",
+      "entry_price": 68.95,
+      "exit_time": "2026-10-27 15:35:05",
+      "exit_price": 0.05,
+      "exit_reason": "EOD",
+      "pnl_points": -68.9,
+      "pnl_rupees": -4478.5
+    },
+    {
+      "date": "2026-10-28",
+      "side": "PE",
+      "strike": 22550.0,
+      "entry_time": "2026-10-28 09:31:05",
+      "entry_price": 219.3,
+      "exit_time": "2026-10-28 15:43:02",
+      "exit_price": 116.95,
+      "exit_reason": "EOD",
+      "pnl_points": -102.35,
+      "pnl_rupees": -6652.75
+    },
+    {
+      "date": "2026-10-29",
+      "side": "CE",
+      "strike": 22750.0,
+      "entry_time": "2026-10-29 09:39:03",
+      "entry_price": 165.0,
+      "exit_time": "2026-10-29 15:43:02",
+      "exit_price": 289.25,
+      "exit_reason": "EOD",
+      "pnl_points": 124.25,
+      "pnl_rupees": 8076.25
+    },
+    {
+      "date": "2026-10-30",
+      "side": "CE",
+      "strike": 23000.0,
+      "entry_time": "2026-10-30 09:35:02",
+      "entry_price": 132.35,
+      "exit_time": "2026-10-30 15:43:02",
+      "exit_price": 126.4,
+      "exit_reason": "EOD",
+      "pnl_points": -5.95,
+      "pnl_rupees": -386.75
+    },
+    {
+      "date": "2026-11-02",
+      "side": "CE",
+      "strike": 23300.0,
+      "entry_time": "2026-11-02 09:39:03",
+      "entry_price": 92.25,
+      "exit_time": "2026-11-02 15:43:02",
+      "exit_price": 96.95,
+      "exit_reason": "EOD",
+      "pnl_points": 4.7,
+      "pnl_rupees": 305.5
+    },
+    {
+      "date": "2026-11-03",
+      "side": "CE",
+      "strike": 23650.0,
+      "entry_time": "2026-11-03 09:51:05",
+      "entry_price": 48.1,
+      "exit_time": "2026-11-03 15:43:02",
+      "exit_price": 160.85,
+      "exit_reason": "EOD",
+      "pnl_points": 112.75,
+      "pnl_rupees": 7328.75
+    },
+    {
+      "date": "2026-11-05",
+      "side": "CE",
+      "strike": 24400.0,
+      "entry_time": "2026-11-05 09:47:02",
+      "entry_price": 144.9,
+      "exit_time": "2026-11-05 15:43:04",
+      "exit_price": 234.6,
+      "exit_reason": "EOD",
+      "pnl_points": 89.7,
+      "pnl_rupees": 5830.5
+    },
+    {
+      "date": "2026-11-06",
+      "side": "CE",
+      "strike": 24550.0,
+      "entry_time": "2026-11-06 09:35:02",
+      "entry_price": 149.65,
+      "exit_time": "2026-11-06 15:43:02",
+      "exit_price": 450.95,
+      "exit_reason": "EOD",
+      "pnl_points": 301.3,
+      "pnl_rupees": 19584.5
+    },
+    {
+      "date": "2026-11-09",
+      "side": "PE",
+      "strike": 24850.0,
+      "entry_time": "2026-11-09 10:43:03",
+      "entry_price": 80.5,
+      "exit_time": "2026-11-09 15:43:04",
+      "exit_price": 0.05,
+      "exit_reason": "EOD",
+      "pnl_points": -80.45,
+      "pnl_rupees": -5229.25
+    }
+  ]
+}
