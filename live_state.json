@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-11-12T12:39:03+05:30",
-  "generated_at": "2026-11-12T12:43:11.550706",
+  "as_of": "2026-11-12T12:43:03+05:30",
+  "generated_at": "2026-11-12T12:47:10.043482",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25221.4,
+  "spot": 25223.75,
   "atm": 25200.0,
   "expiry": "2026-11-17",
   "orb_cpr": {
@@ -15,44 +15,44 @@
     "cpr_bc": 25256.075000000004,
     "direction": null
   },
-  "legacy_overall": "Put Buy",
-  "overall": "Put Buy",
-  "strongest_strike": 25650.0,
-  "strongest_score": 12.0,
-  "confidence": "Strong",
-  "data_quality": "Complete",
+  "legacy_overall": "No Signal",
+  "overall": "No Signal",
+  "strongest_strike": null,
+  "strongest_score": null,
+  "confidence": null,
+  "data_quality": "Partial history",
   "checklist": {
-    "strike": 25650.0,
+    "strike": 25200.0,
     "ce": {
-      "5m": -3.0,
-      "15m": -3.0,
-      "60m": -1.0,
-      "composite": -12.0
+      "5m": 3.0,
+      "15m": 2.0,
+      "60m": -2.0,
+      "composite": 1.0
     },
     "pe": {
-      "5m": 2.0,
-      "15m": 2.0,
+      "5m": 0.0,
+      "15m": -2.0,
       "60m": 2.0,
-      "composite": 12.0
+      "composite": 2.0
     }
   },
   "oi_metrics": {
-    "spot": 25221.4,
+    "spot": 25223.75,
     "resistance_strike": 25500.0,
-    "resistance_oi": 10062065.0,
+    "resistance_oi": 10023455.0,
     "support_strike": 25000.0,
-    "support_oi": 7949760.0,
+    "support_oi": 7988760.0,
     "max_pain": 25250.0,
-    "pcr": 0.864,
+    "pcr": 0.87,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 9109035.0
+    "atm_straddle_oi": 9359740.0
   },
   "position": {
     "side": "CE",
     "strike": 25350.0,
     "entry_time": "2026-11-12T09:31:07+05:30",
     "entry_price": 208.5,
-    "last_known_price": 134.1,
+    "last_known_price": 136.15,
     "qty": 65,
     "expiry": "2026-11-17"
   },
