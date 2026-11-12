@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>OCORBCPR &mdash; Signal History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --page:           #f2f5fa;
+    --surface-1:      #ffffff;
+    --surface-2:      #e9edf5;
+    --text-primary:   #11151f;
+    --text-secondary: #5a6478;
+    --text-muted:     #838da2;
+    --gridline:       #dbe1ec;
+    --border:         rgba(17,21,31,0.12);
+
+    --accent:         #4a3aa7;
+
+    --good:           #0ca30c;
+    --critical:       #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page:           #0a0d14;
+      --surface-1:      #141a26;
+      --surface-2:      #1c2434;
+      --text-primary:   #eef1f8;
+      --text-secondary: #9aa4bd;
+      --text-muted:     #7c869e;
+      --gridline:       #262f42;
+      --border:         rgba(238,241,248,0.12);
+
+      --accent:         #9085e9;
+
+      --good:           #28c840;
+      --critical:       #f0645f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text-primary); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 20px 24px 40px; }
+
+  header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-bottom: 14px; }
+  h1 { font-size: 21px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); font-size: 15px; margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; padding-top: 3px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 4px 0 18px; }
+  select { font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; color: var(--text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-key { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .legend-key.call { background: var(--good); }
+  .legend-key.put { background: var(--critical); }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat .v.call { color: var(--good); }
+  .stat .v.put { color: var(--critical); }
+  .stat .l { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 8px; margin-bottom: 18px; }
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .axis-label { font-size: 10.5px; fill: var(--text-muted); }
+
+  .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 760px; }
+  thead th { text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child, tbody td:first-child { text-align: left; }
+  tbody td { padding: 8px 14px; border-bottom: 1px solid var(--gridline); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.status-call { color: var(--good); font-weight: 600; }
+  td.status-put { color: var(--critical); font-weight: 600; }
+  td.status-none { color: var(--text-muted); }
+
+  .empty-note { border: 1px dashed var(--border); border-radius: 12px; padding: 16px 18px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+
+  footer { padding: 18px 0 8px; font-size: 13px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<!--main-dashboard-link--><div id="main-dashboard-link" data-mode="bar" style="box-sizing:border-box;width:100%;padding:7px 14px;background:#0f172a;font:600 12px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:left"><a href="https://aps-source.github.io/" style="color:#e2e8f0;text-decoration:none">&#9666; Main dashboard</a></div><!--/main-dashboard-link-->
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>OCORBCPR &mdash; Signal History</h1>
+      <div class="sub">ORB15+CPR direction per 4-min tick (the LIVE trading rule, since 2026-11-11) with the old composite/2x-confirm model shown alongside for comparison only</div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Back to today</a>
+  </header>
+
+  <div class="controls">
+    <select id="daySelect" aria-label="Select day"></select>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-key call"></span>CE</span>
+      <span class="legend-item"><span class="legend-key put"></span>PE</span>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>
+    Reads ocorbcpr_signal_log.json from this folder &mdash; one entry per processed tick, appended automatically
+    (de-duplicated by date+time). "Direction" is what the live rule actually traded/held; "Legacy" is what the
+    retired composite/2x-confirm model would have said at that same tick, logged purely for comparison, it takes
+    no action. Kept for the last 90 days.
+  </footer>
+</div>
+
+<script>
+const LOG_URL = "ocorbcpr_signal_log.json";
+let ALL_ENTRIES = [];
+
+function statusCls(s) { return s === "CE" ? "status-call" : s === "PE" ? "status-put" : "status-none"; }
+
+function renderStats(dayEntries) {
+  const ceN = dayEntries.filter(e => e.direction === "CE").length;
+  const peN = dayEntries.filter(e => e.direction === "PE").length;
+  const flatN = dayEntries.length - ceN - peN;
+  const agree = dayEntries.filter(e => e.direction === e.legacy).length;
+
+  const stats = [
+    ["Ticks logged", dayEntries.length, ""],
+    ["CE ticks", ceN, "call"],
+    ["PE ticks", peN, "put"],
+    ["Flat ticks", flatN, ""],
+    ["Agrees with legacy model", agree + " / " + dayEntries.length, ""],
+  ];
+  const row = document.createElement("div");
+  row.className = "stat-row";
+  stats.forEach(([label, val, cls]) => {
+    const tile = document.createElement("div"); tile.className = "stat";
+    const v = document.createElement("div"); v.className = "v" + (cls ? " " + cls : ""); v.textContent = val;
+    const l = document.createElement("div"); l.className = "l"; l.textContent = label;
+    tile.appendChild(v); tile.appendChild(l);
+    row.appendChild(tile);
+  });
+  return row;
+}
+
+function renderTable(dayEntries) {
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  const table = document.createElement("table");
+  table.innerHTML = "<thead><tr><th>Time</th><th>Direction (live)</th><th>Legacy (composite, comparison only)</th><th>Spot</th>" +
+    "<th>OR15 High</th><th>OR15 Low</th><th>CPR TC</th><th>CPR BC</th></tr></thead>";
+  const tbody = document.createElement("tbody");
+  dayEntries.slice().reverse().forEach(e => {
+    const tr = document.createElement("tr");
+    const timeTd = document.createElement("td"); timeTd.textContent = e.time;
+    const dirTd = document.createElement("td"); dirTd.className = statusCls(e.direction); dirTd.textContent = e.direction;
+    const legTd = document.createElement("td"); legTd.className = statusCls(e.legacy); legTd.textContent = e.legacy;
+    const spotTd = document.createElement("td"); spotTd.textContent = e.spot;
+    const orhTd = document.createElement("td"); orhTd.textContent = e.or_high ?? "—";
+    const orlTd = document.createElement("td"); orlTd.textContent = e.or_low ?? "—";
+    const tcTd = document.createElement("td"); tcTd.textContent = e.cpr_tc ?? "—";
+    const bcTd = document.createElement("td"); bcTd.textContent = e.cpr_bc ?? "—";
+    tr.append(timeTd, dirTd, legTd, spotTd, orhTd, orlTd, tcTd, bcTd);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+function renderPriceChart(dayEntries) {
+  const card = document.createElement("div"); card.className = "chart-card";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "chart");
+  const W = 1040, H = 220, padL = 56, padR = 14, padT = 14, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  const n = dayEntries.length;
+  const x = (i) => padL + plotW * (i / (n - 1 || 1));
+  const spots = dayEntries.map(e => e.spot);
+  const vals = spots.concat(dayEntries.map(e => e.or_high).filter(v => v != null), dayEntries.map(e => e.or_low).filter(v => v != null),
+    dayEntries.map(e => e.cpr_tc).filter(v => v != null), dayEntries.map(e => e.cpr_bc).filter(v => v != null));
+  const sMin = Math.min(...vals), sMax = Math.max(...vals), sSpan = (sMax - sMin) || 1;
+  const y = (v) => padT + plotH - plotH * ((v - sMin) / sSpan);
+
+  [0, 0.5, 1].forEach(f => svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: padT + plotH * (1 - f), y2: padT + plotH * (1 - f), class: "gridline" })));
+  [sMin, (sMin + sMax) / 2, sMax].forEach((v, i) => {
+    const lab = el("text", { x: padL - 8, y: padT + plotH * (1 - i * 0.5) + 4, class: "axis-label", "text-anchor": "end" });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  });
+
+  function levelLine(key, color) {
+    const pts = dayEntries.map((e, i) => (e[key] != null ? `${x(i).toFixed(1)},${y(e[key]).toFixed(1)}` : null)).filter(Boolean);
+    if (pts.length) svg.appendChild(el("polyline", { fill: "none", stroke: color, "stroke-width": "1.3", "stroke-dasharray": "4,3", points: pts.join(" ") }));
+  }
+  levelLine("or_high", "#c77d00"); levelLine("or_low", "#c77d00");
+  levelLine("cpr_tc", "var(--critical)"); levelLine("cpr_bc", "var(--good)");
+
+  svg.appendChild(el("polyline", { fill: "none", stroke: "var(--accent)", "stroke-width": "2", points: spots.map((s, i) => `${x(i).toFixed(1)},${y(s).toFixed(1)}`).join(" ") }));
+
+  dayEntries.forEach((e, i) => {
+    if (e.direction === "CE" || e.direction === "PE") {
+      svg.appendChild(el("circle", { cx: x(i), cy: y(e.spot), r: 2.6, fill: e.direction === "CE" ? "var(--good)" : "var(--critical)" }));
+    }
+  });
+
+  const step = Math.max(1, Math.floor(n / 16));
+  dayEntries.forEach((e, i) => {
+    if (i % step === 0 || n <= 16) {
+      const lab = el("text", { x: x(i), y: H - 6, class: "axis-label", "text-anchor": "middle" });
+      lab.textContent = e.time; svg.appendChild(lab);
+    }
+  });
+  card.appendChild(svg);
+  return card;
+}
+
+function renderDay(date) {
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+  const dayEntries = ALL_ENTRIES.filter(e => e.date === date).sort((a, b) => a.time.localeCompare(b.time));
+
+  if (dayEntries.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No ticks logged for this day yet.";
+    content.appendChild(note);
+    return;
+  }
+
+  content.appendChild(renderPriceChart(dayEntries));
+  content.appendChild(renderStats(dayEntries));
+  content.appendChild(renderTable(dayEntries));
+}
+
+async function init() {
+  const content = document.getElementById("content");
+  try {
+    const res = await fetch(LOG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    ALL_ENTRIES = await res.json();
+  } catch (e) {
+    content.innerHTML = "";
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "Couldn't load ocorbcpr_signal_log.json — " + e.message;
+    content.appendChild(note);
+    return;
+  }
+
+  if (ALL_ENTRIES.length === 0) {
+    const note = document.createElement("div"); note.className = "empty-note";
+    note.textContent = "No signal history yet — check back after the next few ticks.";
+    content.appendChild(note);
+    return;
+  }
+
+  const dates = Array.from(new Set(ALL_ENTRIES.map(e => e.date))).sort().reverse();
+  const select = document.getElementById("daySelect");
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d; opt.textContent = d;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => renderDay(select.value));
+  renderDay(dates[0]);
+}
+
+init();
+</script>
+</body>
+</html>
