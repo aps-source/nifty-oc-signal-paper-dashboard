@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-11-12T10:19:03+05:30",
-  "generated_at": "2026-11-12T10:23:11.526882",
+  "as_of": "2026-11-12T10:23:03+05:30",
+  "generated_at": "2026-11-12T10:27:10.744818",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25349.25,
+  "spot": 25349.15,
   "atm": 25350.0,
   "expiry": "2026-11-17",
   "orb_cpr": {
@@ -24,28 +24,28 @@
   "checklist": {
     "strike": 25350.0,
     "ce": {
-      "5m": 2.0,
+      "5m": 0.0,
       "15m": -2.0,
       "60m": 2.0,
-      "composite": 4.0
+      "composite": 2.0
     },
     "pe": {
-      "5m": -1.0,
-      "15m": 3.0,
+      "5m": -2.0,
+      "15m": 2.0,
       "60m": -2.0,
-      "composite": -1.0
+      "composite": -4.0
     }
   },
   "oi_metrics": {
-    "spot": 25349.25,
+    "spot": 25349.15,
     "resistance_strike": 25500.0,
-    "resistance_oi": 8946925.0,
+    "resistance_oi": 8915530.0,
     "support_strike": 25000.0,
-    "support_oi": 8253830.0,
+    "support_oi": 8317205.0,
     "max_pain": 25300.0,
-    "pcr": 0.783,
+    "pcr": 0.798,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 9821370.0
+    "atm_straddle_oi": 10453235.0
   },
   "position": {
     "side": "CE",
