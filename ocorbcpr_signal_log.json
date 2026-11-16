@@ -37805,5 +37805,16 @@
     "cpr_tc": null,
     "cpr_bc": null,
     "legacy": "CE"
+  },
+  {
+    "date": "2026-11-16",
+    "time": "12:07",
+    "spot": 25260.15,
+    "direction": "Flat",
+    "or_high": 25262.25,
+    "or_low": 25225.5,
+    "cpr_tc": null,
+    "cpr_bc": null,
+    "legacy": "CE"
   }
 ]
