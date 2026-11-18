@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-11-18T15:39:02+05:30",
-  "generated_at": "2026-11-18T15:43:07.766461",
+  "as_of": "2026-11-18T15:43:02+05:30",
+  "generated_at": "2026-11-18T15:47:07.650653",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -17,12 +17,12 @@
   },
   "legacy_overall": "Put Buy",
   "overall": "Put Buy",
-  "strongest_strike": 25000.0,
+  "strongest_strike": 25450.0,
   "strongest_score": 10.0,
   "confidence": "Moderate",
   "data_quality": "Complete",
   "checklist": {
-    "strike": 25000.0,
+    "strike": 25450.0,
     "ce": {
       "5m": -2.0,
       "15m": -3.0,
@@ -39,25 +39,17 @@
   "oi_metrics": {
     "spot": 25227.95,
     "resistance_strike": 25500.0,
-    "resistance_oi": 12964965.0,
+    "resistance_oi": 12957490.0,
     "support_strike": 25000.0,
-    "support_oi": 10674755.0,
+    "support_oi": 10655580.0,
     "max_pain": 25250.0,
     "pcr": 0.779,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 6288685.0
+    "atm_straddle_oi": 6228885.0
   },
-  "position": {
-    "side": "PE",
-    "strike": 25300.0,
-    "entry_time": "2026-11-18T09:35:04+05:30",
-    "entry_price": 183.2,
-    "last_known_price": 205.45,
-    "qty": 65,
-    "expiry": "2026-11-23"
-  },
-  "trades_today": 1,
-  "realized_pnl_today": 6675.5,
+  "position": null,
+  "trades_today": 2,
+  "realized_pnl_today": 8008.0,
   "today_trades": [
     {
       "date": "2026-11-18",
@@ -71,11 +63,24 @@
       "reason": "reversal",
       "pnl_pts": 102.7,
       "pnl_rs": 6675.5
+    },
+    {
+      "date": "2026-11-18",
+      "entry_time": "2026-11-18T09:35:04+05:30",
+      "exit_time": "2026-11-18T15:43:02+05:30",
+      "side": "PE",
+      "strike": 25300.0,
+      "expiry": "2026-11-23",
+      "entry_price": 183.2,
+      "exit_price": 203.7,
+      "reason": "EOD",
+      "pnl_pts": 20.5,
+      "pnl_rs": 1332.5
     }
   ],
   "all_time": {
-    "trades": 187,
-    "win_pct": 33.68983957219251,
-    "net_points": -239.79999999999995
+    "trades": 188,
+    "win_pct": 34.04255319148936,
+    "net_points": -219.29999999999995
   }
 }
