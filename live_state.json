@@ -1,58 +1,58 @@
 {
-  "as_of": "2026-11-17T15:31:08+05:30",
-  "generated_at": "2026-11-17T15:35:18.408773",
+  "as_of": "2026-11-18T09:15:03+05:30",
+  "generated_at": "2026-11-18T09:19:09.452862",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25387.4,
-  "atm": 25400.0,
-  "expiry": "2026-11-17",
+  "spot": 25308.85,
+  "atm": 25300.0,
+  "expiry": "2026-11-23",
   "orb_cpr": {
-    "or_high": 25343.8,
-    "or_low": 25315.65,
-    "or_end": "2026-11-17 09:30:00",
-    "cpr_tc": 25279.783333333326,
-    "cpr_bc": 25257.15,
-    "direction": "CE"
+    "or_high": 25308.85,
+    "or_low": 25308.85,
+    "or_end": "2026-11-18 09:30:00",
+    "cpr_tc": 25404.050000000003,
+    "cpr_bc": 25392.949999999997,
+    "direction": null
   },
-  "legacy_overall": "Put Buy",
-  "overall": "Put Buy",
-  "strongest_strike": 25600.0,
-  "strongest_score": 9.0,
-  "confidence": "Moderate",
-  "data_quality": "Complete",
+  "legacy_overall": "No Signal",
+  "overall": "No Signal",
+  "strongest_strike": null,
+  "strongest_score": null,
+  "confidence": null,
+  "data_quality": "Partial history",
   "checklist": {
-    "strike": 25600.0,
+    "strike": 25300.0,
     "ce": {
-      "5m": 0.0,
-      "15m": -3.0,
-      "60m": -3.0,
-      "composite": -15.0
+      "5m": null,
+      "15m": null,
+      "60m": null,
+      "composite": 0.0
     },
     "pe": {
-      "5m": 1.0,
-      "15m": 1.0,
-      "60m": 2.0,
-      "composite": 9.0
+      "5m": null,
+      "15m": null,
+      "60m": null,
+      "composite": 0.0
     }
   },
   "oi_metrics": {
-    "spot": 25387.4,
-    "resistance_strike": 25400.0,
-    "resistance_oi": 22420905.0,
-    "support_strike": 25350.0,
-    "support_oi": 16034395.0,
+    "spot": 25308.85,
+    "resistance_strike": 25500.0,
+    "resistance_oi": 8073780.0,
+    "support_strike": 25000.0,
+    "support_oi": 9546095.0,
     "max_pain": 25400.0,
-    "pcr": 0.801,
-    "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 38287470.0
+    "pcr": 1.207,
+    "pcr_suggestion": "CALL",
+    "atm_straddle_oi": 7250555.0
   },
   "position": {
     "side": "CE",
     "strike": 25350.0,
     "entry_time": "2026-11-17T09:47:04+05:30",
     "entry_price": 51.95,
-    "last_known_price": 37.3,
+    "last_known_price": 156.45,
     "qty": 65,
     "expiry": "2026-11-17"
   },
