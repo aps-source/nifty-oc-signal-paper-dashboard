@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-11-19T10:59:02+05:30",
-  "generated_at": "2026-11-19T11:03:11.465855",
+  "as_of": "2026-11-19T11:03:02+05:30",
+  "generated_at": "2026-11-19T11:07:08.571972",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25293.55,
+  "spot": 25306.55,
   "atm": 25300.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
@@ -17,42 +17,42 @@
   },
   "legacy_overall": "Call Buy",
   "overall": "Call Buy",
-  "strongest_strike": 25350.0,
-  "strongest_score": 9.0,
-  "confidence": "Moderate",
+  "strongest_strike": 25300.0,
+  "strongest_score": 15.0,
+  "confidence": "Strong",
   "data_quality": "Complete",
   "checklist": {
-    "strike": 25350.0,
+    "strike": 25300.0,
     "ce": {
-      "5m": -2.0,
-      "15m": 1.0,
+      "5m": 2.0,
+      "15m": 2.0,
       "60m": 3.0,
-      "composite": 9.0
+      "composite": 15.0
     },
     "pe": {
-      "5m": 2.0,
+      "5m": -1.0,
       "15m": -2.0,
       "60m": -2.0,
-      "composite": -8.0
+      "composite": -11.0
     }
   },
   "oi_metrics": {
-    "spot": 25293.55,
+    "spot": 25306.55,
     "resistance_strike": 25500.0,
-    "resistance_oi": 11775855.0,
+    "resistance_oi": 12073490.0,
     "support_strike": 25000.0,
-    "support_oi": 14973270.0,
+    "support_oi": 14993810.0,
     "max_pain": 25300.0,
-    "pcr": 1.087,
+    "pcr": 1.074,
     "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 18878860.0
+    "atm_straddle_oi": 19287255.0
   },
   "position": {
     "side": "CE",
     "strike": 25300.0,
     "entry_time": "2026-11-19T09:51:04+05:30",
     "entry_price": 132.55,
-    "last_known_price": 144.85,
+    "last_known_price": 150.95,
     "qty": 65,
     "expiry": "2026-11-23"
   },
