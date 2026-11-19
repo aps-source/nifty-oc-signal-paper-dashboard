@@ -1,14 +1,14 @@
 {
-  "as_of": "2026-11-19T09:15:02+05:30",
-  "generated_at": "2026-11-19T09:19:14.934472",
+  "as_of": "2026-11-19T09:19:04+05:30",
+  "generated_at": "2026-11-19T09:23:09.264004",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25181.35,
-  "atm": 25200.0,
+  "spot": 25231.2,
+  "atm": 25250.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
-    "or_high": 25181.35,
+    "or_high": 25231.2,
     "or_low": 25181.35,
     "or_end": "2026-11-19 09:30:00",
     "cpr_tc": 25258.45,
@@ -22,30 +22,30 @@
   "confidence": null,
   "data_quality": "Partial history",
   "checklist": {
-    "strike": 25200.0,
+    "strike": 25250.0,
     "ce": {
-      "5m": -2.0,
-      "15m": null,
+      "5m": 2.0,
+      "15m": -2.0,
       "60m": null,
       "composite": -2.0
     },
     "pe": {
-      "5m": 2.0,
-      "15m": null,
+      "5m": -2.0,
+      "15m": 3.0,
       "60m": null,
-      "composite": 2.0
+      "composite": 4.0
     }
   },
   "oi_metrics": {
-    "spot": 25181.35,
+    "spot": 25231.2,
     "resistance_strike": 25500.0,
-    "resistance_oi": 12865645.0,
+    "resistance_oi": 13286910.0,
     "support_strike": 25000.0,
-    "support_oi": 10596430.0,
+    "support_oi": 11125595.0,
     "max_pain": 25250.0,
-    "pcr": 0.864,
+    "pcr": 0.791,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 11903450.0
+    "atm_straddle_oi": 6916390.0
   },
   "position": null,
   "trades_today": 0,
