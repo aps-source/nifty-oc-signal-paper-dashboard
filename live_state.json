@@ -1,11 +1,11 @@
 {
-  "as_of": "2026-11-19T14:39:02+05:30",
-  "generated_at": "2026-11-19T14:43:08.862955",
+  "as_of": "2026-11-19T14:43:02+05:30",
+  "generated_at": "2026-11-19T14:47:08.363451",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25478.4,
-  "atm": 25500.0,
+  "spot": 25468.25,
+  "atm": 25450.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
     "or_high": 25231.2,
@@ -15,44 +15,44 @@
     "cpr_bc": 25238.116666666672,
     "direction": "CE"
   },
-  "legacy_overall": "Call Buy",
-  "overall": "Call Buy",
-  "strongest_strike": 25750.0,
-  "strongest_score": 15.0,
-  "confidence": "Strong",
-  "data_quality": "Complete",
+  "legacy_overall": "Put Buy",
+  "overall": "Put Buy",
+  "strongest_strike": 25950.0,
+  "strongest_score": 8.0,
+  "confidence": "Moderate",
+  "data_quality": "Partial history",
   "checklist": {
-    "strike": 25750.0,
+    "strike": 25950.0,
     "ce": {
-      "5m": 0.0,
-      "15m": 3.0,
-      "60m": 3.0,
-      "composite": 15.0
+      "5m": -1.0,
+      "15m": -2.0,
+      "60m": null,
+      "composite": -5.0
     },
     "pe": {
-      "5m": 3.0,
-      "15m": -1.0,
-      "60m": -2.0,
-      "composite": -5.0
+      "5m": 2.0,
+      "15m": 3.0,
+      "60m": null,
+      "composite": 8.0
     }
   },
   "oi_metrics": {
-    "spot": 25478.4,
-    "resistance_strike": 26000.0,
-    "resistance_oi": 15582645.0,
+    "spot": 25468.25,
+    "resistance_strike": 25500.0,
+    "resistance_oi": 10214295.0,
     "support_strike": 25000.0,
-    "support_oi": 15538315.0,
+    "support_oi": 15610920.0,
     "max_pain": 25400.0,
-    "pcr": 1.091,
-    "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 17118205.0
+    "pcr": 1.365,
+    "pcr_suggestion": "CALL",
+    "atm_straddle_oi": 6479265.0
   },
   "position": {
     "side": "CE",
     "strike": 25300.0,
     "entry_time": "2026-11-19T09:51:04+05:30",
     "entry_price": 132.55,
-    "last_known_price": 268.4,
+    "last_known_price": 259.3,
     "qty": 65,
     "expiry": "2026-11-23"
   },
