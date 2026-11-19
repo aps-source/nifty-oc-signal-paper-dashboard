@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-11-19T15:39:02+05:30",
-  "generated_at": "2026-11-19T15:43:07.037871",
+  "as_of": "2026-11-19T15:43:02+05:30",
+  "generated_at": "2026-11-19T15:47:14.152777",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
@@ -17,12 +17,12 @@
   },
   "legacy_overall": "Call Buy",
   "overall": "Call Buy",
-  "strongest_strike": 25550.0,
+  "strongest_strike": 25800.0,
   "strongest_score": 18.0,
   "confidence": "Strong",
   "data_quality": "Complete",
   "checklist": {
-    "strike": 25550.0,
+    "strike": 25800.0,
     "ce": {
       "5m": 3.0,
       "15m": 3.0,
@@ -43,21 +43,13 @@
     "support_strike": 25000.0,
     "support_oi": 14553110.0,
     "max_pain": 25400.0,
-    "pcr": 1.094,
+    "pcr": 1.098,
     "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 16086395.0
+    "atm_straddle_oi": 16330210.0
   },
-  "position": {
-    "side": "CE",
-    "strike": 25300.0,
-    "entry_time": "2026-11-19T09:51:04+05:30",
-    "entry_price": 132.55,
-    "last_known_price": 296.55,
-    "qty": 65,
-    "expiry": "2026-11-23"
-  },
-  "trades_today": 1,
-  "realized_pnl_today": -4397.25,
+  "position": null,
+  "trades_today": 2,
+  "realized_pnl_today": 6383.0,
   "today_trades": [
     {
       "date": "2026-11-19",
@@ -71,11 +63,24 @@
       "reason": "reversal",
       "pnl_pts": -67.65,
       "pnl_rs": -4397.25
+    },
+    {
+      "date": "2026-11-19",
+      "entry_time": "2026-11-19T09:51:04+05:30",
+      "exit_time": "2026-11-19T15:43:02+05:30",
+      "side": "CE",
+      "strike": 25300.0,
+      "expiry": "2026-11-23",
+      "entry_price": 132.55,
+      "exit_price": 298.4,
+      "reason": "EOD",
+      "pnl_pts": 165.85,
+      "pnl_rs": 10780.25
     }
   ],
   "all_time": {
-    "trades": 189,
-    "win_pct": 33.86243386243386,
-    "net_points": -286.95
+    "trades": 190,
+    "win_pct": 34.21052631578947,
+    "net_points": -121.1
   }
 }
