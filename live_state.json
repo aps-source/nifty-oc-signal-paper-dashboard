@@ -1,11 +1,11 @@
 {
-  "as_of": "2026-11-20T09:39:04+05:30",
-  "generated_at": "2026-11-20T09:43:08.077351",
+  "as_of": "2026-11-20T09:43:02+05:30",
+  "generated_at": "2026-11-20T09:47:08.939579",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25439.8,
-  "atm": 25450.0,
+  "spot": 25477.25,
+  "atm": 25500.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
     "or_high": 25471.45,
@@ -13,41 +13,49 @@
     "or_end": "2026-11-20 09:30:00",
     "cpr_tc": 25450.86666666667,
     "cpr_bc": 25324.0,
-    "direction": null
+    "direction": "CE"
   },
-  "legacy_overall": "Put Buy",
-  "overall": "Put Buy",
-  "strongest_strike": 25450.0,
-  "strongest_score": 9.0,
-  "confidence": "Moderate",
+  "legacy_overall": "No Signal",
+  "overall": "No Signal",
+  "strongest_strike": null,
+  "strongest_score": null,
+  "confidence": null,
   "data_quality": "Partial history",
   "checklist": {
-    "strike": 25450.0,
+    "strike": 25500.0,
     "ce": {
+      "5m": 2.0,
+      "15m": 2.0,
+      "60m": null,
+      "composite": 6.0
+    },
+    "pe": {
       "5m": -2.0,
       "15m": -2.0,
       "60m": null,
       "composite": -6.0
-    },
-    "pe": {
-      "5m": 3.0,
-      "15m": 3.0,
-      "60m": null,
-      "composite": 9.0
     }
   },
   "oi_metrics": {
-    "spot": 25439.8,
+    "spot": 25477.25,
     "resistance_strike": 25500.0,
-    "resistance_oi": 17287075.0,
+    "resistance_oi": 17778215.0,
     "support_strike": 25400.0,
-    "support_oi": 16187925.0,
+    "support_oi": 16821545.0,
     "max_pain": 25400.0,
-    "pcr": 1.103,
-    "pcr_suggestion": "CALL",
-    "atm_straddle_oi": 15934425.0
+    "pcr": 0.943,
+    "pcr_suggestion": "NEUTRAL",
+    "atm_straddle_oi": 27198990.0
   },
-  "position": null,
+  "position": {
+    "side": "CE",
+    "strike": 25500.0,
+    "entry_time": "2026-11-20T09:43:02+05:30",
+    "entry_price": 106.9,
+    "last_known_price": 106.9,
+    "qty": 65,
+    "expiry": "2026-11-23"
+  },
   "trades_today": 0,
   "realized_pnl_today": 0.0,
   "today_trades": [],
