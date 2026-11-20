@@ -1,83 +1,56 @@
 {
-  "as_of": "2026-11-19T15:43:02+05:30",
-  "generated_at": "2026-11-19T15:47:14.152777",
+  "as_of": "2026-11-20T09:15:02+05:30",
+  "generated_at": "2026-11-20T09:19:11.791638",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25514.3,
-  "atm": 25500.0,
+  "spot": 25403.9,
+  "atm": 25400.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
-    "or_high": 25231.2,
-    "or_low": 25148.25,
-    "or_end": "2026-11-19 09:30:00",
-    "cpr_tc": 25258.45,
-    "cpr_bc": 25238.116666666672,
-    "direction": "CE"
+    "or_high": 25403.9,
+    "or_low": 25403.9,
+    "or_end": "2026-11-20 09:30:00",
+    "cpr_tc": 25450.86666666667,
+    "cpr_bc": 25324.0,
+    "direction": null
   },
-  "legacy_overall": "Call Buy",
-  "overall": "Call Buy",
-  "strongest_strike": 25800.0,
-  "strongest_score": 18.0,
-  "confidence": "Strong",
-  "data_quality": "Complete",
+  "legacy_overall": "No Signal",
+  "overall": "No Signal",
+  "strongest_strike": null,
+  "strongest_score": null,
+  "confidence": null,
+  "data_quality": "Partial history",
   "checklist": {
-    "strike": 25800.0,
+    "strike": 25400.0,
     "ce": {
-      "5m": 3.0,
-      "15m": 3.0,
-      "60m": 3.0,
-      "composite": 18.0
+      "5m": null,
+      "15m": -2.0,
+      "60m": null,
+      "composite": -4.0
     },
     "pe": {
-      "5m": -2.0,
-      "15m": -2.0,
-      "60m": -2.0,
-      "composite": -12.0
+      "5m": null,
+      "15m": 2.0,
+      "60m": null,
+      "composite": 4.0
     }
   },
   "oi_metrics": {
-    "spot": 25514.3,
-    "resistance_strike": 26000.0,
-    "resistance_oi": 15157220.0,
+    "spot": 25403.9,
+    "resistance_strike": 25500.0,
+    "resistance_oi": 8711885.0,
     "support_strike": 25000.0,
-    "support_oi": 14553110.0,
+    "support_oi": 14160315.0,
     "max_pain": 25400.0,
-    "pcr": 1.098,
-    "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 16330210.0
+    "pcr": 1.537,
+    "pcr_suggestion": "CALL",
+    "atm_straddle_oi": 12058410.0
   },
   "position": null,
-  "trades_today": 2,
-  "realized_pnl_today": 6383.0,
-  "today_trades": [
-    {
-      "date": "2026-11-19",
-      "entry_time": "2026-11-19T09:31:04+05:30",
-      "exit_time": "2026-11-19T09:51:04+05:30",
-      "side": "PE",
-      "strike": 25150.0,
-      "expiry": "2026-11-23",
-      "entry_price": 162.65,
-      "exit_price": 95.0,
-      "reason": "reversal",
-      "pnl_pts": -67.65,
-      "pnl_rs": -4397.25
-    },
-    {
-      "date": "2026-11-19",
-      "entry_time": "2026-11-19T09:51:04+05:30",
-      "exit_time": "2026-11-19T15:43:02+05:30",
-      "side": "CE",
-      "strike": 25300.0,
-      "expiry": "2026-11-23",
-      "entry_price": 132.55,
-      "exit_price": 298.4,
-      "reason": "EOD",
-      "pnl_pts": 165.85,
-      "pnl_rs": 10780.25
-    }
-  ],
+  "trades_today": 0,
+  "realized_pnl_today": 0.0,
+  "today_trades": [],
   "all_time": {
     "trades": 190,
     "win_pct": 34.21052631578947,
