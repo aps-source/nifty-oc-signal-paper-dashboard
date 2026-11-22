@@ -228,26 +228,29 @@
       <div class="logo">◆</div>
       <div>
         <h1>NIFTY Option-Chain Signal</h1>
-        <div class="tag">Multi-timeframe price + OI + IV confirmation &middot; PAPER ONLY &middot; 1 lot</div>
+        <div class="tag">ORB15min + CPR, pure reversal exit &middot; PAPER ONLY &middot; 1 lot</div>
       </div>
     </div>
     <div class="hero-right">
       <div class="live-clock"><div class="d" id="live-clock-date">—</div><div class="t" id="live-clock-time">—</div></div>
       <span class="hero-pill" id="clock">loading…</span>
       <a class="btn" href="trades.html">Full trade log &rarr;</a>
-      <a class="btn" href="signal_log.html">Signal history &rarr;</a>
-      <a class="btn" href="ocorbcpr.html">OCORBCPR backtest &rarr;</a>
-      <a class="btn" href="ocorbcpr_signal_log.html">OCORBCPR signal history &rarr;</a>
+      <a class="btn" href="ocorbcpr.html">Backtest &rarr;</a>
+      <a class="btn" href="ocorbcpr_signal_log.html">Signal history &rarr;</a>
     </div>
   </div>
   <details class="rules">
     <summary>Model rules &amp; backtest result</summary>
-    <p>Per strike/side/timeframe (5m/15m/60m): price move &ge;0.5% sets direction, +1 each if OI and IV confirm
-    same-direction &ge;0.5%, score -3..+3. Composite = 5m + 2&times;15m + 3&times;60m. Call/Put Buy needs
-    composite &ge;8 and &ge;3 clear of the other side. Entry: 1 lot of the Strongest Strike at signal. Exit: opposite
-    signal (reverse) or forced close at day end. No stop-loss or target.
-    <b>Backtested across 10 prior sessions: ~coin-flip win rate (47-57%) at every horizon, both sides — no edge found.</b>
-    This paper loop is a live continuation of that same test, not a validated strategy.</p>
+    <p>Call Buy only once spot is above BOTH the first-15-minute opening-range high (09:15-09:30) AND the day's
+    CPR Top Central (TC); Put Buy only once spot is below BOTH the OR-15 low AND CPR Bottom Central (BC);
+    otherwise flat. CPR TC/BC from the PREVIOUS day's completed spot high/low/close
+    (Pivot=(H+L+C)/3, BC=(H+L)/2, TC=2&times;Pivot-BC). Entry: 1 lot of the ATM strike. Exit: PURE REVERSAL
+    (opposite condition closes+reopens immediately, no debounce) or forced close at day end. No stop-loss or target.
+    <b>Backtested on 20 live days (2026-10-12 to 11-09): 18 trades, 61.1% win, +743.6 net pts</b> -- the best
+    result of every variant tried, including the original composite price+OI+IV score model this replaced on
+    2026-11-11 (that model and every option-chain confirmation filter tried against this rule since scored
+    lower -- full comparison on the Backtest page). Live since 2026-11-11; still thin (18 trades) on one
+    continuous NIFTY rally -- watch live results, don't assume.</p>
   </details>
 </header>
 
@@ -318,24 +321,6 @@ function sparkline(trades) {
     </div>`;
 }
 
-/* ------------------------------ checklist (why did/didn't it fire) ------------------------------ */
-function segRow(label, pts) {
-  return `<div class="crit-row"><span>${label}</span><b>${pts > 0 ? "+" + pts : pts}</b></div>`;
-}
-function checkCol(name, side, cl) {
-  if (!cl) return `<div class="ccol ${side}"><div class="chead"><span class="cname">${name}</span></div><div class="na-note">No data</div></div>`;
-  const full = Math.abs(cl.composite) >= 8;
-  const segs = ["5m", "15m", "60m"].map((k) => `<i class="${cl[k] ? "on" : ""}"></i>`).join("");
-  return `
-    <div class="ccol ${side}">
-      <div class="chead"><span class="cname">${name}</span><span class="cscore ${full ? "full" : ""}">${cl.composite}${full ? " · SIGNAL" : ""}</span></div>
-      <div class="segs">${segs}</div>
-      ${segRow("5-min score", cl["5m"])}
-      ${segRow("15-min score", cl["15m"])}
-      ${segRow("60-min score", cl["60m"])}
-    </div>`;
-}
-
 /* ------------------------------ market levels ladder ------------------------------ */
 function renderLevels(state) {
   const oi = state.oi_metrics;
@@ -391,12 +376,12 @@ function renderDecision(state) {
     el.innerHTML = decisionHtml(p.side, p.side === "CE" ? "▲" : "▼", "Holding", `${p.side} ${p.strike}`, `Entered ${tm(p.entry_time)} @ ${p.entry_price} — exits on opposite signal or day close`);
     return;
   }
-  if (state.overall === "Call Buy" || state.overall === "Put Buy") {
-    const side = state.overall === "Call Buy" ? "CE" : "PE";
-    el.innerHTML = decisionHtml(side, side === "CE" ? "▲" : "▼", `Signal live as of ${tm(state.as_of)}`, `${state.overall} (Strongest Strike)`, `Strike ${state.strongest_strike} — Spot ${state.spot} — ${state.confidence}`);
+  const oc = state.orb_cpr;
+  if (oc && (oc.direction === "CE" || oc.direction === "PE")) {
+    el.innerHTML = decisionHtml(oc.direction, oc.direction === "CE" ? "▲" : "▼", `Signal live as of ${tm(state.as_of)}`, `${oc.direction} (ORB15+CPR)`, `Spot ${state.spot} vs OR15 ${oc.or_high}/${oc.or_low}, CPR TC/BC ${oc.cpr_tc?.toFixed(1)}/${oc.cpr_bc?.toFixed(1)}`);
     return;
   }
-  el.innerHTML = decisionHtml("PENDING", "…", `As of ${tm(state.as_of)}`, state.overall || "No Signal", `Spot ${state.spot} — flat, waiting for a new signal`);
+  el.innerHTML = decisionHtml("PENDING", "…", `As of ${tm(state.as_of)}`, "No Signal", `Spot ${state.spot} — flat, waiting for a new signal`);
 }
 
 /* ------------------------------ main panel ------------------------------ */
@@ -415,16 +400,14 @@ function renderPanel(state) {
     posHtml = '<span class="pos-empty">No open position</span>';
   }
 
-  const cl = state.checklist;
-  const checklistHtml = cl ? `
+  const oc = state.orb_cpr;
+  const checklistHtml = oc ? `
     <div class="box">
-      <h3>Signal checklist &middot; strike ${cl.strike}</h3>
-      <div class="checklist-grid">
-        ${checkCol("Call (CE)", "ce", cl.ce)}
-        ${checkCol("Put (PE)", "pe", cl.pe)}
-      </div>
-      <div class="na-note">Needs composite &ge;8 and &ge;3 clear of the other side to fire. Strike shown: the
-      Strongest Strike when a signal is live, otherwise ATM.</div>
+      <h3>ORB15+CPR levels</h3>
+      <div class="crit-row"><span>OR-15 high / low</span><b>${oc.or_high ?? "—"} / ${oc.or_low ?? "—"}</b></div>
+      <div class="crit-row"><span>CPR TC / BC (prev day)</span><b>${oc.cpr_tc?.toFixed(1) ?? "—"} / ${oc.cpr_bc?.toFixed(1) ?? "—"}</b></div>
+      <div class="crit-row"><span>Current direction</span><b>${oc.direction ?? "Flat"}</b></div>
+      <div class="na-note">Call Buy needs spot above BOTH OR-15 high and CPR TC; Put Buy needs spot below BOTH OR-15 low and CPR BC.</div>
     </div>` : "";
 
   const closed = (state.today_trades || []).slice().reverse();
@@ -514,9 +497,9 @@ function renderKpis(state) {
     <div class="kpi ${dd.stale ? "warn" : "good"}"><div class="k">Option chain date</div><div class="v" style="font-size:1.15rem;">${dd.label}</div><div class="s">${dd.sub}</div></div>
     <div class="kpi ${open ? (open.side === "CE" ? "blue" : "pink") : "teal"}"><div class="k">Open position</div><div class="v">${open ? open.side + " " + open.strike : "Flat"}</div><div class="s">${open ? `entered ${tm(open.entry_time)}` : "no position"}</div></div>
     <div class="kpi ${st.cls === "live" ? "good" : st.cls === "preview" ? "warn" : "bad"}"><div class="k">Status</div><div class="v" style="font-size:1.1rem;"><span class="st-pill ${st.cls}"><span class="dot"></span>${st.label}</span></div><div class="s">as of ${dtm(state.as_of)}</div></div>
-    <div class="kpi"><div class="k">Overall signal</div><div class="v" style="font-size:1.1rem;">${state.overall}</div><div class="s">${state.confidence || "—"} &middot; strike ${state.strongest_strike ?? "—"}</div></div>
+    <div class="kpi"><div class="k">Overall signal</div><div class="v" style="font-size:1.1rem;">${state.orb_cpr?.direction ?? "Flat"}</div><div class="s">ORB15+CPR &middot; spot ${state.spot}</div></div>
     <div class="kpi ${(allTime.win_pct ?? 50) >= 50 ? "good" : "warn"}"><div class="k">All-time (paper)</div><div class="v" style="font-size:1.1rem;">${allTime.trades ?? 0} trades</div><div class="s">${allTime.win_pct != null ? allTime.win_pct.toFixed(0) + "% win" : "—"} &middot; ${(allTime.net_points ?? 0).toFixed(1)} pts</div></div>
-    <div class="kpi warn"><div class="k">Backtest context</div><div class="v" style="font-size:1.1rem;">47&ndash;57%</div><div class="s">win rate, 10 sessions &mdash; coin-flip, no edge found</div></div>
+    <div class="kpi good"><div class="k">Backtest context</div><div class="v" style="font-size:1.1rem;">61.1%</div><div class="s">win rate, 18 trades, 20 sessions &mdash; best of every variant tried</div></div>
   `;
 }
 
