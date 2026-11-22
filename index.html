@@ -176,6 +176,13 @@
   .crit-row b { font-weight: 700; }
   .na-note { color: var(--text-muted); font-size: 0.82rem; padding: 0.2rem 0 0.5rem; }
 
+  .chk-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; font-size: 0.86rem; padding: 0.32rem 0; border-top: 1px solid var(--gridline); }
+  .chk-row:first-child { border-top: none; }
+  .chk-row .lbl { color: var(--text-secondary); }
+  .chk-pass { color: var(--good); font-weight: 700; white-space: nowrap; }
+  .chk-fail { color: var(--critical); font-weight: 700; white-space: nowrap; }
+  .chk-pending { color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+
   .ladder { position: relative; height: 3.6rem; margin: 0.4rem 0.4rem 0.2rem; }
   .ladder .track { position: absolute; left: 0; right: 0; top: 1.55rem; height: 0.7rem; border-radius: 999px; background: linear-gradient(90deg, var(--good), var(--warning) 50%, var(--critical)); opacity: 0.9; }
   .ladder .mk { position: absolute; top: 1.3rem; width: 0.4rem; height: 1.2rem; border-radius: 3px; background: var(--surface-1); border: 2px solid var(--text-primary); transform: translateX(-50%); }
@@ -228,7 +235,7 @@
       <div class="logo">◆</div>
       <div>
         <h1>NIFTY Option-Chain Signal</h1>
-        <div class="tag">ORB15min + CPR, pure reversal exit &middot; PAPER ONLY &middot; 1 lot</div>
+        <div class="tag">ORB15min + CPR, pure reversal exit &middot; PAPER ONLY &middot; 1 lot &middot; algo runs 09:15&ndash;15:45 IST weekdays only</div>
       </div>
     </div>
     <div class="hero-right">
@@ -236,6 +243,7 @@
       <span class="hero-pill" id="clock">loading…</span>
       <a class="btn" href="trades.html">Full trade log &rarr;</a>
       <a class="btn" href="ocorbcpr.html">Backtest &rarr;</a>
+      <a class="btn" href="ocorbcpr_signal_log.html">Signal history &rarr;</a>
     </div>
   </div>
   <details class="rules">
@@ -265,16 +273,22 @@
     edge from PCR, OI walls or max-pain on their own. Shown for context, not as a signal.</div>
   </div>
 
+  <div class="split" id="checklists">
+    <div class="card"><h2>Start-of-day checklist</h2><div id="sod-checklist"></div></div>
+    <div class="card"><h2>Entry condition checklist</h2><div id="entry-checklist"></div></div>
+    <div class="card"><h2>Exit condition checklist</h2><div id="exit-checklist"></div></div>
+  </div>
+
   <div id="root"></div>
 
   <footer>
-    Reads live_state.json from this same site every 30s, pushed by the paper loop every 4 min, 09:19&ndash;15:47 IST
+    Reads live_state.json from this same site every 60s, pushed by the paper loop every 4 min, 09:19&ndash;15:47 IST
     weekdays. Read-only — never places, modifies or cancels any order, paper or real.
   </footer>
 </main>
 
 <script>
-const REFRESH_MS = 30 * 1000;
+const REFRESH_MS = 60 * 1000;
 const STATE_URL = "live_state.json";
 
 const $ = (id) => document.getElementById(id);
@@ -350,6 +364,61 @@ function renderLevels(state) {
       <div class="lvl mp"><div class="l">Max pain</div><div class="n">${oi.max_pain}</div><div class="d">${gap(oi.max_pain)}</div></div>
       <div class="lvl pcr"><div class="l">PCR</div><div class="n">${oi.pcr ?? "—"}</div><div class="d">Suggests <span class="suggest ${oi.pcr_suggestion}">${oi.pcr_suggestion}</span></div></div>
     </div>`;
+}
+
+/* ------------------------------ checklists ------------------------------ */
+function chkRow(label, state, valueText) {
+  const cls = state === true ? "chk-pass" : state === false ? "chk-fail" : "chk-pending";
+  const text = state === true ? "PASS" : state === false ? "FAIL" : "—";
+  return `<div class="chk-row"><span class="lbl">${label}</span><span class="${cls}">${text}${valueText ? " &middot; " + valueText : ""}</span></div>`;
+}
+
+function renderSodChecklist(state) {
+  const oc = state.orb_cpr;
+  const el = $("sod-checklist");
+  if (!oc) { el.innerHTML = '<div class="pos-empty">No data</div>'; return; }
+  const cprOk = oc.cpr_tc != null;
+  const orOk = oc.or_high != null;
+  el.innerHTML =
+    chkRow("Prior-day CPR computed", cprOk, cprOk ? `TC ${oc.cpr_tc.toFixed(1)} / BC ${oc.cpr_bc.toFixed(1)}` : "waiting for prior day's file") +
+    chkRow("Opening range (09:15&ndash;09:30) closed", orOk, orOk ? `High ${oc.or_high} / Low ${oc.or_low}` : "building&hellip;") +
+    `<div class="na-note">Checked once per tick, from the same orb_cpr levels the live rule trades on.</div>`;
+}
+
+function renderEntryChecklist(state) {
+  const oc = state.orb_cpr;
+  const el = $("entry-checklist");
+  if (!oc || oc.or_high == null || oc.cpr_tc == null) { el.innerHTML = '<div class="pos-empty">Waiting on OR15/CPR data&hellip;</div>'; return; }
+  const spot = Number(state.spot);
+  const aboveOr = spot > oc.or_high, aboveTc = spot > oc.cpr_tc;
+  const belowOr = spot < oc.or_low, belowBc = spot < oc.cpr_bc;
+  el.innerHTML =
+    `<div class="na-note" style="padding-top:0">Call Buy needs BOTH rows true; Put Buy needs BOTH rows true below.</div>` +
+    chkRow("Spot &gt; OR15 High", aboveOr, `${spot} vs ${oc.or_high}`) +
+    chkRow("Spot &gt; CPR TC", aboveTc, `${spot} vs ${oc.cpr_tc.toFixed(1)}`) +
+    chkRow("Spot &lt; OR15 Low", belowOr, `${spot} vs ${oc.or_low}`) +
+    chkRow("Spot &lt; CPR BC", belowBc, `${spot} vs ${oc.cpr_bc.toFixed(1)}`) +
+    chkRow("Current direction", oc.direction === "CE" ? true : oc.direction === "PE" ? false : null, oc.direction ?? "Flat");
+}
+
+function renderExitChecklist(state) {
+  const el = $("exit-checklist");
+  const oc = state.orb_cpr;
+  if (!state.position) { el.innerHTML = '<div class="pos-empty">No open position &mdash; nothing to exit</div>'; return; }
+  const p = state.position;
+  const opposite = oc && oc.direction && oc.direction !== p.side;
+  const nowMin = state.as_of ? new Date(state.as_of) : null;
+  let eodClose = false, eodNote = "&mdash;";
+  if (nowMin) {
+    const ist = new Date(nowMin.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    const mins = ist.getHours() * 60 + ist.getMinutes();
+    eodClose = mins >= 15 * 60 + 40;
+    eodNote = eodClose ? "past 15:40, forced close due" : `${ist.getHours()}:${String(ist.getMinutes()).padStart(2, "0")} IST, before 15:40`;
+  }
+  el.innerHTML =
+    chkRow(`Opposite condition forming (would flip ${p.side})`, opposite || false, oc ? (oc.direction ?? "Flat") : "&mdash;") +
+    chkRow("Past EOD cutoff (15:40)", eodClose, eodNote) +
+    `<div class="na-note">Pure reversal exit: closes the moment either row goes PASS, whichever first.</div>`;
 }
 
 /* ------------------------------ decision banner ------------------------------ */
@@ -521,10 +590,13 @@ async function refresh() {
   renderKpis(state);
   renderDecision(state);
   renderLevels(state);
+  renderSodChecklist(state);
+  renderEntryChecklist(state);
+  renderExitChecklist(state);
   $("root").innerHTML = renderPanel(state);
   wireFullscreen();
 
-  $("clock").textContent = "Updated " + new Date().toLocaleTimeString("en-IN") + " · refreshes every 30s";
+  $("clock").textContent = "Updated " + new Date().toLocaleTimeString("en-IN") + " · refreshes every 60s";
 }
 
 let _fsListenerAdded = false;
