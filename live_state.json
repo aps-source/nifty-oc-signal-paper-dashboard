@@ -1,70 +1,35 @@
 {
-  "as_of": "2026-11-20T15:43:02+05:30",
-  "generated_at": "2026-11-20T15:47:07.190624",
+  "as_of": "2026-11-23T09:15:13+05:30",
+  "generated_at": "2026-11-23T09:19:10.251832",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25800.6,
-  "atm": 25800.0,
+  "spot": 25976.95,
+  "atm": 26000.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
-    "or_high": 25471.45,
-    "or_low": 25403.9,
-    "or_end": "2026-11-20 09:30:00",
-    "cpr_tc": 25450.86666666667,
-    "cpr_bc": 25324.0,
-    "direction": "CE"
-  },
-  "legacy_overall": "Put Buy",
-  "overall": "Put Buy",
-  "strongest_strike": 26250.0,
-  "strongest_score": 15.0,
-  "confidence": "Strong",
-  "data_quality": "Complete",
-  "checklist": {
-    "strike": 26250.0,
-    "ce": {
-      "5m": -2.0,
-      "15m": -2.0,
-      "60m": -3.0,
-      "composite": -15.0
-    },
-    "pe": {
-      "5m": 2.0,
-      "15m": 2.0,
-      "60m": 3.0,
-      "composite": 15.0
-    }
+    "or_high": 25976.95,
+    "or_low": 25976.95,
+    "or_end": "2026-11-23 09:30:00",
+    "cpr_tc": 25734.483333333337,
+    "cpr_bc": 25602.25,
+    "direction": null
   },
   "oi_metrics": {
-    "spot": 25800.6,
+    "spot": 25976.95,
     "resistance_strike": 26000.0,
-    "resistance_oi": 14314430.0,
+    "resistance_oi": 13720915.0,
     "support_strike": 25500.0,
-    "support_oi": 14694680.0,
-    "max_pain": 25650.0,
-    "pcr": 0.929,
-    "pcr_suggestion": "NEUTRAL",
-    "atm_straddle_oi": 10997025.0
+    "support_oi": 13861120.0,
+    "max_pain": 25700.0,
+    "pcr": 0.501,
+    "pcr_suggestion": "PUT",
+    "atm_straddle_oi": 15285465.0
   },
   "position": null,
-  "trades_today": 1,
-  "realized_pnl_today": 10926.5,
-  "today_trades": [
-    {
-      "date": "2026-11-20",
-      "entry_time": "2026-11-20T09:43:02+05:30",
-      "exit_time": "2026-11-20T15:43:02+05:30",
-      "side": "CE",
-      "strike": 25500.0,
-      "expiry": "2026-11-23",
-      "entry_price": 106.9,
-      "exit_price": 275.0,
-      "reason": "EOD",
-      "pnl_pts": 168.1,
-      "pnl_rs": 10926.5
-    }
-  ],
+  "trades_today": 0,
+  "realized_pnl_today": 0.0,
+  "today_trades": [],
   "all_time": {
     "trades": 191,
     "win_pct": 34.55497382198953,
