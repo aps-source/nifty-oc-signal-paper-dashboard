@@ -1,10 +1,10 @@
 {
-  "as_of": "2026-11-23T13:31:04+05:30",
-  "generated_at": "2026-11-23T13:35:09.800841",
+  "as_of": "2026-11-23T13:35:02+05:30",
+  "generated_at": "2026-11-23T13:39:13.180285",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25457.5,
+  "spot": 25452.75,
   "atm": 25450.0,
   "expiry": "2026-11-23",
   "orb_cpr": {
@@ -16,22 +16,22 @@
     "direction": "PE"
   },
   "oi_metrics": {
-    "spot": 25457.5,
+    "spot": 25452.75,
     "resistance_strike": 25500.0,
-    "resistance_oi": 29571360.0,
+    "resistance_oi": 29222635.0,
     "support_strike": 25400.0,
-    "support_oi": 22470890.0,
+    "support_oi": 22714965.0,
     "max_pain": 25500.0,
-    "pcr": 0.87,
+    "pcr": 0.877,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 27386645.0
+    "atm_straddle_oi": 27488305.0
   },
   "position": {
     "side": "PE",
     "strike": 25600.0,
     "entry_time": "2026-11-23T09:35:03+05:30",
     "entry_price": 130.0,
-    "last_known_price": 149.4,
+    "last_known_price": 157.85,
     "qty": 65,
     "expiry": "2026-11-23"
   },
