@@ -1,11 +1,11 @@
 {
-  "as_of": "2026-11-25T09:28:27+05:30",
-  "generated_at": "2026-11-25T09:31:12.550334",
+  "as_of": "2026-11-25T09:32:27+05:30",
+  "generated_at": "2026-11-25T09:35:09.568260",
   "is_preview": false,
   "preview_date": null,
   "start_date": "2026-10-12",
-  "spot": 25756.2,
-  "atm": 25750.0,
+  "spot": 25785.95,
+  "atm": 25800.0,
   "expiry": "2026-12-01",
   "orb_cpr": {
     "or_high": 25756.2,
@@ -13,34 +13,48 @@
     "or_end": "2026-11-25 09:30:00",
     "cpr_tc": 25663.300000000003,
     "cpr_bc": 25454.199999999997,
-    "direction": null
+    "direction": "CE"
   },
   "oi_metrics": {
-    "spot": 25756.2,
+    "spot": 25785.95,
     "resistance_strike": 26000.0,
-    "resistance_oi": 8833695.0,
+    "resistance_oi": 9177220.0,
     "support_strike": 25700.0,
-    "support_oi": 5441150.0,
+    "support_oi": 5859750.0,
     "max_pain": 25700.0,
-    "pcr": 0.636,
+    "pcr": 0.657,
     "pcr_suggestion": "PUT",
-    "atm_straddle_oi": 5782010.0
+    "atm_straddle_oi": 9882600.0
   },
   "position": {
-    "side": "PE",
-    "strike": 25600.0,
-    "entry_time": "2026-11-23T09:35:03+05:30",
-    "entry_price": 130.0,
-    "last_known_price": 157.25,
+    "side": "CE",
+    "strike": 25800.0,
+    "entry_time": "2026-11-25T09:31:04+05:30",
+    "entry_price": 234.2,
+    "last_known_price": 237.1,
     "qty": 65,
-    "expiry": "2026-11-23"
+    "expiry": "2026-12-01"
   },
-  "trades_today": 0,
-  "realized_pnl_today": 0.0,
-  "today_trades": [],
+  "trades_today": 1,
+  "realized_pnl_today": 1189.5,
+  "today_trades": [
+    {
+      "date": "2026-11-25",
+      "entry_time": "2026-11-23T09:35:03+05:30",
+      "exit_time": "2026-11-25T09:31:04+05:30",
+      "side": "PE",
+      "strike": 25600.0,
+      "expiry": "2026-11-23",
+      "entry_price": 130.0,
+      "exit_price": 148.3,
+      "reason": "reversal",
+      "pnl_pts": 18.3,
+      "pnl_rs": 1189.5
+    }
+  ],
   "all_time": {
-    "trades": 191,
-    "win_pct": 34.55497382198953,
-    "net_points": 47.0
+    "trades": 192,
+    "win_pct": 34.89583333333333,
+    "net_points": 65.3
   }
 }
